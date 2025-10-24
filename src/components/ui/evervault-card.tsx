@@ -19,21 +19,26 @@ export const EvervaultCard = ({
   return (
     <div
       className={cn(
-        "p-0.5  bg-transparent aspect-square  flex items-center justify-center w-full h-full relative",
+        "p-0  bg-transparent aspect-square   flex items-center justify-center w-full max-h-screen relative",
         className
       )}
     >
-      <div className="group/card rounded-3xl w-full relative overflow-hidden bg-transparent flex items-center justify-center h-full">
+      <div className="group/card  w-full relative overflow-hidden bg-transparent flex items-center justify-center h-full">
+        
         <CardPattern
           mouseX={mouseX}
           mouseY={mouseY}
           randomString={randomString}
         />
         <div className="relative z-10 flex items-center justify-center">
-          <div className="relative  flex-col w-full py-14 px-10 bg-white/5 dark:bg-black/20  backdrop-blur-xs  rounded-4xl flex items-end justify-center  font-semibold text-4xl border border-muted/30 ">
+          <div className="relative  flex-col w-full py-20 px-10 bg-white/5 dark:bg-black/20  backdrop-blur-xs   flex items-center justify-center rounded-3xl   border border-muted/30 ">
             {/* <div className="absolute w-full h-full bg-white/80 dark:bg-black/80 blur-sm rounded-5xl" /> */}
-            <span className="   dark:text-white text-white/95 z-20">{text}</span>
-            <span className="   dark:text-white text-white/85 text-lg font-normal z-20">The future of hiring, authentic & decentralized</span>
+            <span className="   dark:text-white text-white text-4xl lg:text-5xl font-semibold  z-20">
+              {text}
+            </span>
+            <span className="   dark:text-white text-white/90 text-lg lg:mt-3 lg:text-xl font-medium z-20">
+              The future of hiring, authentic & decentralized
+            </span>
           </div>
         </div>
       </div>
@@ -52,23 +57,23 @@ export function CardPattern({ mouseX, mouseY, randomString }: any) {
   useEffect(() => {
     const animate = (time: number) => {
       if (time - lastUpdateRef.current > 50) {
-        setDisplayString((prev:string) => {
-          const chars = prev.split('');
+        setDisplayString((prev: string) => {
+          const chars = prev.split("");
           // Randomly change ~1% of characters each frame
           const numChanges = Math.floor(chars.length * 0.01);
-          
+
           for (let i = 0; i < numChanges; i++) {
             const randomIndex = Math.floor(Math.random() * chars.length);
             chars[randomIndex] = characters.charAt(
               Math.floor(Math.random() * characters.length)
             );
           }
-          
-          return chars.join('');
+
+          return chars.join("");
         });
         lastUpdateRef.current = time;
       }
-      
+
       frameRef.current = requestAnimationFrame(animate);
     };
 
@@ -82,17 +87,19 @@ export function CardPattern({ mouseX, mouseY, randomString }: any) {
   }, []);
 
   return (
-    <div className="pointer-events-none">
-      <div className="absolute inset-0 rounded-2xl  mask-[linear-gradient(white,transparent)] group-hover/card:opacity-50"></div>
-      <motion.div className="absolute inset-0 rounded-2xl bg-linear-to-r from-emerald-500 to-sky-700 opacity-100 backdrop-blur-xl" />
-      <motion.div className="absolute inset-0 rounded-2xl opacity-100 mix-blend-overlay">
+// rounded-bl-3xl rounded-tl-3xl
+  <div className="pointer-events-none">
+      <div className="absolute inset-0   mask-[linear-gradient(white,transparent)] group-hover/card:opacity-50"></div>
+      <motion.div className="absolute inset-0  bg-linear-to-r from-emerald-500 to-sky-700 opacity-100 backdrop-blur-xl" />
+      <motion.div className="absolute inset-0  opacity-100 mix-blend-overlay">
         <p className="absolute inset-0 text-xs h-full w-full wrap-break-word whitespace-pre-wrap text-white font-mono font-bold overflow-hidden">
           {displayString}
         </p>
       </motion.div>
 
-      <div className="absolute inset-0 rounded-2xl bg-[radial-gradient(ellipse_at_center,transparent_0%,transparent_10%,rgba(0,0,0,0.6)_100%)]"></div>
-      <div className="absolute inset-0 rounded-2xl bg-[radial-gradient(ellipse_at_center,transparent_0%,transparent_30%,rgba(0,0,0,0.4)_100%)]"></div>
+      <div className="absolute inset-0  bg-[radial-gradient(ellipse_at_center,transparent_0%,transparent_10%,rgba(0,0,0,0.6)_100%)]"></div>
+      <div className="absolute inset-0  bg-[radial-gradient(ellipse_at_center,transparent_0%,transparent_30%,rgba(0,0,0,0.4)_100%)]"></div>
+      <div className="absolute inset-0 bg-linear-120 from-background/0 dark:from-background/80 to-transparent"></div>
     </div>
   );
 }
