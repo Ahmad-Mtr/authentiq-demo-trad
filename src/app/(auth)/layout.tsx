@@ -12,7 +12,7 @@ export default function Layout({
         <div className="flex justify-center gap-2 md:justify-start">
           <a
             href="/"
-            className="flex items-center gap-1 text-2xl font-semibold"
+            className="flex items-center gap-1 text-2xl font-semibold font-raleway"
           >
             authentiq
           </a>
@@ -26,7 +26,7 @@ export default function Layout({
           width="1"
           height={"100vh"}
           viewBox="0 0 1 100"
-          className="dark:stroke-border/70 h-full  w-0.5 "
+          className="stroke-emerald-500/50 dark:stroke-border/70 h-full  w-0.5 "
           preserveAspectRatio="none"
           aria-hidden="true"
         >

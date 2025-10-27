@@ -1,11 +1,18 @@
-import { GalleryVerticalEnd } from "lucide-react";
+"use client";
 
 import { SignupForm } from "@/components/signup-form";
+import { useAuthRedirect } from "@/lib/hooks/useAuthRedirect";
 
 export default function SignupPage() {
-  return (
+  const { isChecking } = useAuthRedirect({ requireGuest: true });
 
-            <SignupForm />
-          
-  );
+  if (isChecking) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  return <SignupForm />;
 }

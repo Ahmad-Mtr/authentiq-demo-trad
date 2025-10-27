@@ -33,10 +33,10 @@ export const EvervaultCard = ({
         <div className="relative z-10 flex items-center justify-center">
           <div className="relative  flex-col w-full py-20 px-10 bg-white/5 dark:bg-black/20  backdrop-blur-xs   flex items-center justify-center rounded-3xl   border border-muted/30 ">
             {/* <div className="absolute w-full h-full bg-white/80 dark:bg-black/80 blur-sm rounded-5xl" /> */}
-            <span className="   dark:text-white text-white text-4xl lg:text-5xl font-semibold  z-20">
-              {text}
+            <span className="font-raleway text-white  text-6xl lg:text-8xl font-medium  z-20">
+              Join authentiq
             </span>
-            <span className="   dark:text-white text-white/90 text-lg lg:mt-3 lg:text-xl font-medium z-20">
+            <span className="font-raleway dark:text-white text-white text-lg lg:mt-4 lg:text-xl font-medium z-20">
               The future of hiring, authentic & decentralized
             </span>
           </div>
@@ -99,7 +99,7 @@ export function CardPattern({ mouseX, mouseY, randomString }: any) {
 
       <div className="absolute inset-0  bg-[radial-gradient(ellipse_at_center,transparent_0%,transparent_10%,rgba(0,0,0,0.6)_100%)]"></div>
       <div className="absolute inset-0  bg-[radial-gradient(ellipse_at_center,transparent_0%,transparent_30%,rgba(0,0,0,0.4)_100%)]"></div>
-      <div className="absolute inset-0 bg-linear-120 from-background/0 dark:from-background/80 to-transparent"></div>
+      <div className="absolute inset-0 bg-linear-90 from-background/0  dark:from-background/80 to-transparent"></div>
     </div>
   );
 }

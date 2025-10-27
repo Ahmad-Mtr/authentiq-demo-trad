@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Mona_Sans } from "next/font/google";
+import { Raleway, Geist_Mono, Mona_Sans } from "next/font/google";
 import "./globals.css";
 
+const raleway = Raleway({
+  variable: "--font-raleway",
+  subsets: ["latin"],
+});
 const monaSans = Mona_Sans({
   variable: "--font-mona-sans",
   subsets: ["latin"],
@@ -25,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${monaSans.variable} ${geistMono.variable} antialiased`}
+        className={`${monaSans.variable} ${geistMono.variable} ${raleway.variable} antialiased`}
       >
         {children}
       </body>
