@@ -1,3 +1,4 @@
+"use client";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { account, ID } from "@/lib/appwrite";
@@ -60,6 +61,7 @@ export const useAuthStore = create(
       },
       signInWithGithub: () => {
         try {
+            
           const hostUrl = process.env.NEXT_PUBLIC_HOST_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
           console.log("[authStore] GitHub OAuth redirecting to:", `${hostUrl}/auth/callback`);
           

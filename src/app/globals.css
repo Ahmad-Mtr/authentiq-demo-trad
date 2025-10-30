@@ -120,4 +120,20 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  .txt-title {
+    /* font-family: var(--font-raleway); */
+    @apply max-w-xs text-3xl font-semibold leading-10 tracking-tight text-foreground ;
+  }
+  .txt-base {
+    /* font-family: var(--font-sans); */
+    @apply max-w-md text-lg leading-8 text-foreground/80
+  }
+  .txt-strong{
+    @apply font-medium text-foreground;
+  }
+
+  .link{
+    @apply underline underline-offset-4 hover:text-accent-foreground transition-colors;
+  }
 }
