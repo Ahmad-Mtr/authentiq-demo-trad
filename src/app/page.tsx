@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <AuthGuard requireAuth>
+    /*<AuthGuard requireAuth>*/
       <ProfileContainer />
-    </AuthGuard>
+   /* </AuthGuard>*/
   );
 }
