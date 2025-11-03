@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Raleway, Geist_Mono, Mona_Sans } from "next/font/google";
+import { Raleway, Geist_Mono, Mona_Sans, Kalnia } from "next/font/google";
 import "./globals.css";
 
 const raleway = Raleway({
@@ -16,6 +16,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const kalnia = Kalnia({
+  variable: "--font-kalnia",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
   title: "Authentiq Proof of Concept (non-atproto version)",
   description: "This is the non-atproto version of the Authentiq proof of concept. supported authentiq features here are: auth, user profile, and Hiring Agent",
@@ -28,8 +33,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          async
+          crossOrigin="anonymous"
+          src="https://tweakcn.com/live-preview.min.js"
+        />
+      </head>
       <body
-        className={`${monaSans.variable} ${geistMono.variable} ${raleway.variable} antialiased`}
+        className={`${monaSans.variable} ${geistMono.variable} ${raleway.variable} ${kalnia.variable} antialiased`}
       >
         {children}
       </body>

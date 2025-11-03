@@ -5,102 +5,155 @@ import { useAuthRedirect } from "@/lib/hooks/useAuthRedirect";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { profileAPI } from "@/lib/appwrite/profile";
+import { account } from "@/lib/appwrite";
+import { Suspense, useEffect, useState } from "react";
+import { useProfileStore } from "@/lib/stores/profileStore";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { getInitials } from "@/lib/utils";
+import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
+import { Label } from "@radix-ui/react-label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Home() {
-  const { isChecking } = useAuthRedirect({ requireAuth: true });
-  const { user, logOut } = useAuthStore();
   const router = useRouter();
+  const {
+    profile,
+    isLoading,
+    hasChecked,
+    setProfile,
+    setLoading,
+    setHasChecked,
+  } = useProfileStore();
 
+  const { user, logOut } = useAuthStore();
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  useEffect(() => {
+    checkProfileStatus();
+  }, []);
+
+  const checkProfileStatus = async () => {
+    try {
+      setLoading(true);
+
+      // Get current user
+      const user = await account.get();
+      setCurrentUser(user);
+
+      // Check if profile exists
+      const existingProfile = await profileAPI.getProfileByUserId(user.$id);
+
+      if (existingProfile) {
+        setProfile(existingProfile);
+      } else {
+        setProfile(null);
+      }
+
+      setHasChecked(true);
+    } catch (error) {
+      console.error("Error checking profile:", error);
+      // If user is not authenticated, redirect to login
+      router.push("/login");
+    } finally {
+      setLoading(false);
+    }
+  };
   const handleLogout = async () => {
     await logOut();
     router.push("/login");
   };
 
-  if (isChecking) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-      </div>
-    );
+  if (isLoading || !hasChecked) {
+    return <div>22Loading...</div>;
   }
 
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <div className="flex w-full items-center justify-between">
-          <Image
-            className="dark:invert"
-            src="/next.svg"
-            alt="Next.js logo"
-            width={100}
-            height={20}
-            priority
-          />
-          <button
-            onClick={handleLogout}
-            className="rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600"
-          >
-            Logout
-          </button>
-        </div>
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="txt-title">
-            Welcome, {user?.name || "User"}!
-          </h1>
-          <p className="txt-base">
-            You are successfully logged in. Email: {user?.email}
-          </p>
+  if (!profile) return null;
 
-          <h1 className="txt-title">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="txt-base">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="txt-strong link"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+  return (
+    <div className="flex flex-col md:flex-row min-h-screen items-center justify-center bg-background">
+      <main className="flex md:flex-1 md:h-screen w-full  flex-col items-center justify-center py-32 px-16  border-r-2 border-border sm:items-start space-y-6">
+        {/* avatar */}
+        <div className="*:data-[slot=avatar]:ring-ring/60 *:data-[slot=avatar]:ring-2  w-full flex justify-center ">
+          <Avatar className="w-32 h-32 rounded-4xl">
+            <AvatarImage src={profile?.profilePictureUrl} />
+            <AvatarFallback className="text-5xl rounded-4xl ">
+              {getInitials(profile.name)}
+            </AvatarFallback>
+          </Avatar>
+        </div>
+
+        {/* Name & Handle */}
+        <div className="flex justify-center w-full flex-col items-center space-y-1 mt-2 text-center">
+          <h1 className="txt-idk">{profile.name}</h1>
+          <span className="text-muted-foreground">{profile.email}</span>
+        </div>
+
+        {/* Role & bio */}
+        <div className="flex justify-center w-full flex-col items-center text-center space-y-2 mt-12 mb-24">
+          <h1 className="txt-idk max-w-md">{profile.role}</h1>
+          <p className="text-muted-foreground text-xl max-w-md line-clamp-3">
+            {profile.bio}
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <Button className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-primary px-5 text-primary-foreground transition-colors hover:bg-primary/80  md:w-[158px] text-base font-medium ">
-            Documentation
-          </Button>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/8 px-5 transition-colors hover:border-transparent hover:bg-black/4 dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+
+        {/* Connect btn */}
+        <Button size={"main"} className="w-full! h-16 text-lg  ">
+          Connect
+        </Button>
       </main>
+      <section className="flex md:flex-2  2xl:flex-3 md:h-screen w-full  flex-col items-center justify-between   sm:items-start">
+        <Tabs defaultValue="home" className="w-full">
+          <div className="font-mono w-full h-auto p-4 border-b-2 border-border">
+            <TabsList className=" px-12 py-6 space-x-3 bg-background">
+              <TabsTrigger
+                className="text-lg font-semibold py-4 px-5 data-[state=active]:text-foreground text-muted-foreground"
+                value="home"
+              >
+                Home
+              </TabsTrigger>{" "}
+              <TabsTrigger
+                className="text-lg font-semibold py-4 px-5 data-[state=active]:text-foreground text-muted-foreground"
+                value="account"
+              >
+                Resume
+              </TabsTrigger>
+            </TabsList>
+          </div>
+          <TabsContent value="home">See your Posts here.</TabsContent>
+          <TabsContent value="account">
+            <div className="w-full py-32 px-16">
+              <Suspense fallback={<div>Loading profile...</div>}>
+                <div className="txt-title">Resume</div>
+                <Button onClick={handleLogout}>Logout</Button>
+                {profile && (
+                  <div>
+                    <h1 className="text-3xl font-bold">{profile.name}</h1>
+                    <p className="text-foreground/75">{profile.role}</p>
+                    <p className="text-muted-foreground text-sm">
+                      {profile.email}
+                    </p>
+                  </div>
+                )}
+              </Suspense>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </section>
     </div>
   );
 }
