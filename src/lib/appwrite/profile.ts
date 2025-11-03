@@ -1,4 +1,3 @@
-// lib/appwrite/profile.ts
 import { tablesDB, appwriteConfig, ID } from "@/lib/appwrite";
 import { Query } from "appwrite";
 import { Profile } from "../interfaces";
@@ -57,7 +56,7 @@ export const profileAPI = {
     userId: string;
     name: string;
     email: string;
-    profilePictureUrl?: string;
+    profilePictureUrl?: string | null;
     location: string;
     dateOfBirth: string;
     gender: string;
@@ -71,8 +70,6 @@ export const profileAPI = {
         rowId: ID.unique(),
         data: {
           ...profileData,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
         },
       });
       
