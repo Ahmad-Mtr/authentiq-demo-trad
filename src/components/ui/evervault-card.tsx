@@ -37,7 +37,7 @@ export const EvervaultCard = ({
               Join authentiq
             </span>
             <span className="font-raleway dark:text-white text-white text-lg lg:mt-4 lg:text-xl font-medium z-20">
-              The future of hiring, authentic & decentralized
+              The future of hiring authentic & decentralized
             </span>
           </div>
         </div>
@@ -90,7 +90,7 @@ export function CardPattern({ mouseX, mouseY, randomString }: any) {
 // rounded-bl-3xl rounded-tl-3xl
   <div className="pointer-events-none">
       <div className="absolute inset-0   mask-[linear-gradient(white,transparent)] group-hover/card:opacity-50"></div>
-      <motion.div className="absolute inset-0  bg-linear-to-r from-emerald-500 to-sky-700 opacity-100 backdrop-blur-xl" />
+      <motion.div className="absolute inset-0  bg-linear-to-r from-temerald-500/85 to-shakespeare-700 opacity-100 backdrop-blur-xl" />
       <motion.div className="absolute inset-0  opacity-100 mix-blend-overlay">
         <p className="absolute inset-0 text-xs h-full w-full wrap-break-word whitespace-pre-wrap text-white font-mono font-bold overflow-hidden">
           {displayString}
