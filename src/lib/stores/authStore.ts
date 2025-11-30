@@ -1,20 +1,20 @@
 "use client";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { account, ID } from "@/lib/appwrite";
-import { Models, OAuthProvider } from "appwrite";
+import supabase from "../supabase";
+import { User } from "@supabase/supabase-js";
 
 type UserState = {
   isLoggedIn: boolean;
-  user: Models.User<Models.Preferences> | null;
+  user: User | null;
   _hasHydrated: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (
     name: string,
     email: string,
     password: string
-  ) => Promise<Models.User<Models.Preferences>>;
-  signInWithGithub: () => void;
+  ) => Promise<User>;
+  signInWithGithub: () => Promise<void>;
   logOut: () => Promise<void>;
   checkSession: () => Promise<boolean>;
   setHasHydrated: (value: boolean) => void;
@@ -30,15 +30,28 @@ export const useAuthStore = create(
         name: string,
         email: string,
         password: string
-      ): Promise<Models.User<Models.Preferences>> => {
+      ): Promise<User> => {
         try {
-          const res = await account.create({
-            userId: ID.unique(),
+          const { data, error } = await supabase.auth.signUp({
             email,
             password,
-            name,
+            options: {
+              data: {
+                name: name,
+              },
+            },
           });
-          return res;
+
+          if (error) {
+            console.error("Registration failed:", error);
+            throw error;
+          }
+
+          if (!data.user) {
+            throw new Error("No user returned from signup");
+          }
+
+          return data.user;
         } catch (error) {
           console.error("Registration failed:", error);
           throw error;
@@ -46,31 +59,39 @@ export const useAuthStore = create(
       },
       signIn: async (email: string, password: string) => {
         try {
-          await account.createEmailPasswordSession({ email, password });
-          const user = await account.get();
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+
+          if (error) {
+            console.error("Sign in failed:", error);
+            throw error;
+          }
+
           set((state) => ({
             ...state,
             isLoggedIn: true,
-            user,
+            user: data.user,
           }));
-          
         } catch (error) {
           console.error("Sign in failed:", error);
           throw error;
         }
       },
-      signInWithGithub: () => {
+      signInWithGithub: async () => {
         try {
-            
-          const hostUrl = process.env.NEXT_PUBLIC_HOST_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
-          console.log("[authStore] GitHub OAuth redirecting to:", `${hostUrl}/auth/callback`);
-          
-          account.createOAuth2Session({
-            provider: OAuthProvider.Github,
-            success: `${hostUrl}/auth/callback`,
-            failure: `${hostUrl}/auth/callback`,
-            scopes: ["account"],
+          const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: "github",
+            options: {
+              redirectTo: `${window.location.origin}/auth/callback`,
+            },
           });
+
+          if (error) {
+            console.error("GitHub OAuth failed:", error);
+            throw error;
+          }
         } catch (error) {
           console.error("GitHub OAuth failed:", error);
           throw error;
@@ -78,7 +99,13 @@ export const useAuthStore = create(
       },
       logOut: async () => {
         try {
-          await account.deleteSession({ sessionId: "current" });
+          const { error } = await supabase.auth.signOut();
+          
+          if (error) {
+            console.error("Logout failed:", error);
+            throw error;
+          }
+
           set((state) => ({
             ...state,
             isLoggedIn: false,
@@ -92,14 +119,35 @@ export const useAuthStore = create(
       checkSession: async () => {
         try {
           console.log("[authStore] Checking session...");
-          const user = await account.get();
-          console.log("[authStore] Session valid, user:", user);
+          const { data: { session }, error } = await supabase.auth.getSession();
+          
+          if (error) {
+            console.log("[authStore] Session check error:", error);
+            set((state) => ({
+              ...state,
+              isLoggedIn: false,
+              user: null,
+            }));
+            return false;
+          }
+
+          if (session?.user) {
+            console.log("[authStore] Session valid, user:", session.user);
+            set((state) => ({
+              ...state,
+              isLoggedIn: true,
+              user: session.user,
+            }));
+            return true;
+          }
+
+          console.log("[authStore] No valid session");
           set((state) => ({
             ...state,
-            isLoggedIn: true,
-            user,
+            isLoggedIn: false,
+            user: null,
           }));
-          return true;
+          return false;
         } catch (error) {
           console.log("[authStore] No valid session:", error);
           set((state) => ({
