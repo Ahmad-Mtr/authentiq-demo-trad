@@ -16,7 +16,7 @@ export function ProfileSidebar({ profile }: ProfileSidebarProps) {
       {/* avatar */}
       <div className="*:data-[slot=avatar]:ring-ring/60 *:data-[slot=avatar]:ring-2 w-full flex justify-center">
         <Avatar className="w-32 h-32 rounded-4xl">
-          <AvatarImage src={profile?.profilePictureUrl} />
+          <AvatarImage src={profile?.pfp_url} />
           <AvatarFallback className="text-5xl rounded-4xl">
             {getInitials(profile.name)}
           </AvatarFallback>

@@ -3,8 +3,8 @@
 import { use, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useProfileStore } from "@/lib/stores/profileStore";
-import { profileAPI } from "@/lib/appwrite/profile";
-import { account } from "@/lib/appwrite";
+import { profileAPI } from "@/lib/supabase/profile";
+import supabase from "@/lib/supabase";
 import { ProfileSidebar } from "./profile-sidebar";
 import { ProfileTabs } from "./profile-tabs";
 import ProfileOnboarding from "./profile-onboarding";
@@ -29,11 +29,17 @@ export function ProfileContainer() {
     try {
       setLoading(true);
 
-      // Get current user
-      const user = await account.get();
+      // Get current user from Supabase
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        console.error("Error getting user:", userError);
+        router.push("/login");
+        return;
+      }
 
       // Check if profile exists
-      const existingProfile = await profileAPI.getProfileByUserId(user.$id);
+      const existingProfile = await profileAPI.getProfileByUserId(user.id);
 
       if (existingProfile) {
         setProfile(existingProfile);

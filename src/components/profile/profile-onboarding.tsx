@@ -2,14 +2,14 @@
 
 import { useState, useRef } from "react";
 import { useProfileStore } from "@/lib/stores/profileStore";
-import { profileAPI } from "@/lib/appwrite/profile";
+import { profileAPI } from "@/lib/supabase/profile";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { date } from "zod";
 import { useAuthStore } from "@/lib/stores/authStore";
-import { account, storage, appwriteConfig, ID } from "@/lib/appwrite";
+import supabase from "@/lib/supabase";
 import {
   Select,
   SelectContent,
@@ -34,13 +34,13 @@ export default function ProfileOnboarding() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [formData, setFormData] = useState({
-    name: user?.name || "",
+    name: user?.user_metadata?.name || user?.user_metadata?.full_name || "",
     email: user?.email || "",
     role: "",
     bio: "",
     location: "",
-    dateOfBirth: "",
-    profilePictureUrl: "",
+    date_of_birth: "",
+    pfp_url: "",
     gender: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -90,20 +90,32 @@ export default function ProfileOnboarding() {
       const objectUrl = URL.createObjectURL(file);
       setPreviewUrl(objectUrl);
 
-      const uploadedFile = await storage.createFile({
-        bucketId: appwriteConfig.profilePicsBucketId,
-        fileId: ID.unique(),
-        file: file,
-      });
+      // Generate a unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user?.id}-${Date.now()}.${fileExt}`;
+      const filePath = `profile-pictures/${fileName}`;
 
-      const fileUrl = `${appwriteConfig.endpoint}/storage/buckets/${appwriteConfig.profilePicsBucketId}/files/${uploadedFile.$id}/view?project=${appwriteConfig.projectId}`;
+      // Upload to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('profile-pictures')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('profile-pictures')
+        .getPublicUrl(filePath);
 
       setFormData({
         ...formData,
-        profilePictureUrl: fileUrl,
+        pfp_url: publicUrl,
       });
 
-      console.log('Image uploaded successfully:', fileUrl);
+      console.log('Image uploaded successfully:', publicUrl);
     } catch (err) {
       console.error('Error uploading image:', err);
       setError('Failed to upload image. Please try again.');
@@ -123,7 +135,7 @@ export default function ProfileOnboarding() {
     setIsSubmitting(true);
     try {
       // Validate
-      if (!formData.name || !formData.email || !formData.role || !formData.location || !formData.dateOfBirth || !formData.gender) {
+      if (!formData.name || !formData.email || !formData.role || !formData.location || !formData.date_of_birth || !formData.gender) {
         setError("Please fill in all required fields");
         setIsSubmitting(false);
         return;
@@ -132,7 +144,7 @@ export default function ProfileOnboarding() {
       // TODO: handle OAuth data here
       // Create profile
       const newProfile = await profileAPI.createProfile({
-        userId: user?.$id!,
+        user_id: user?.id!,
         ...formData,
       });
 
@@ -168,7 +180,7 @@ export default function ProfileOnboarding() {
                     onClick={handleAvatarClick}
                   >
                     <AvatarImage 
-                      src={previewUrl || formData.profilePictureUrl} 
+                      src={previewUrl || formData.pfp_url} 
                       alt="Profile preview"
                     />
                     <AvatarFallback className="text-4xl bg-muted">
@@ -319,8 +331,8 @@ export default function ProfileOnboarding() {
               </FieldLabel>
               {/* <Input
                 type="date"
-                name="dateOfBirth"
-                value={formData.dateOfBirth}
+                name="date_of_birth"
+                value={formData.date_of_birth}
                 onChange={handleChange}
                 className="w-full px-4 py-2"
                 required
@@ -350,7 +362,7 @@ export default function ProfileOnboarding() {
                       setDate(date);
                       setFormData({
                         ...formData,
-                        dateOfBirth: date
+                        date_of_birth: date
                           ? date.toISOString().split("T")[0]
                           : "",
                       });

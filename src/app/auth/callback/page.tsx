@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/lib/stores/authStore";
+import supabase from "@/lib/supabase";
 
 export default function AuthCallbackPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { checkSession } = useAuthStore();
   const [status, setStatus] = useState<"loading" | "success" | "error">(
     "loading"
@@ -13,56 +15,57 @@ export default function AuthCallbackPage() {
 
   useEffect(() => {
     const handleCallback = async () => {
-        // Wait u nigga appwrite
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      let retries = 0;
-      const maxRetries = 3;
-      const retryDelay = 1000; // 1 second between retries
-
-      while (retries < maxRetries) {
-        try {
-          console.log(`[OAuth Callback] Attempt ${retries + 1}/${maxRetries} - Checking session...`);
-          const isAuthenticated = await checkSession();
+      try {
+        // Get the code from URL params (Supabase OAuth flow)
+        const code = searchParams.get('code');
+        
+        if (code) {
+          console.log("[OAuth Callback] Exchanging code for session...");
           
-          console.log(`[OAuth Callback] isAuthenticated:`, isAuthenticated);
+          // Exchange the code for a session
+          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
           
-          if (isAuthenticated) {
-            console.log("[OAuth Callback] Authentication successful!");
-            setStatus("success");
-            
-            setTimeout(() => {
-              console.log("[OAuth Callback] Redirecting to /");
-              router.push("/");
-            }, 500);
-            return;
+          if (error) {
+            console.error("[OAuth Callback] Error exchanging code:", error);
+            throw error;
           }
           
-          console.log(`[OAuth Callback] Not authenticated yet, retrying in ${retryDelay}ms...`);
-          retries++;
-          if (retries < maxRetries) {
-            await new Promise((resolve) => setTimeout(resolve, retryDelay));
-          }
-        } catch (error) {
-          console.error(`[OAuth Callback] Error on attempt ${retries + 1}:`, error);
-          retries++;
-          
-          if (retries < maxRetries) {
-            await new Promise((resolve) => setTimeout(resolve, retryDelay));
-          }
+          console.log("[OAuth Callback] Session established:", data);
         }
-      }
 
-      console.error("[OAuth Callback] Failed after", maxRetries, "attempts");
-      setStatus("error");
-      
-      setTimeout(() => {
-        router.push("/login");
-      }, 3000);
+        // Small delay to ensure session is fully established
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        // Verify authentication
+        const isAuthenticated = await checkSession();
+        
+        console.log("[OAuth Callback] isAuthenticated:", isAuthenticated);
+        
+        if (isAuthenticated) {
+          console.log("[OAuth Callback] Authentication successful!");
+          setStatus("success");
+          
+          setTimeout(() => {
+            console.log("[OAuth Callback] Redirecting to /");
+            router.push("/");
+          }, 500);
+          return;
+        }
+        
+        throw new Error("Authentication verification failed");
+        
+      } catch (error) {
+        console.error("[OAuth Callback] Error:", error);
+        setStatus("error");
+        
+        setTimeout(() => {
+          router.push("/login");
+        }, 3000);
+      }
     };
 
     handleCallback();
-  }, [checkSession, router]);
+  }, [checkSession, router, searchParams]);
 
   return (
     <div className="flex min-h-screen items-center justify-center">
