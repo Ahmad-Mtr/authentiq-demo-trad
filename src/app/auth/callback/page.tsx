@@ -4,10 +4,14 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/lib/stores/authStore";
 import supabase from "@/lib/supabase";
-
-export default function AuthCallbackPage() {
+import { use } from 'react'
+export default function AuthCallbackPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ code?: string }>
+}) {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const params = use(searchParams)
   const { checkSession } = useAuthStore();
   const [status, setStatus] = useState<"loading" | "success" | "error">(
     "loading"
@@ -17,7 +21,7 @@ export default function AuthCallbackPage() {
     const handleCallback = async () => {
       try {
         // Get the code from URL params (Supabase OAuth flow)
-        const code = searchParams.get('code');
+        const code = params.code;
         
         if (code) {
           console.log("[OAuth Callback] Exchanging code for session...");
