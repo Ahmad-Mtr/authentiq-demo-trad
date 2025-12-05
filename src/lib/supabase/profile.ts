@@ -1,5 +1,6 @@
 import supabase from "@/lib/supabase";
 import { Profile } from "../interfaces";
+import { ParsedResume } from "../interfaces/resume";
 
 export const profileAPI = {
   // Check if profile exists
@@ -37,6 +38,8 @@ export const profileAPI = {
     gender: string;
     role: string;
     bio: string;
+    resume_id?: string;
+    parsed_resume?: ParsedResume;
   }): Promise<Profile> {
     try {
       const { data, error } = await supabase

@@ -1,4 +1,6 @@
 
+import { ParsedResume } from "./resume";
+
 export interface Profile {
   user_id: string;
   name: string;
@@ -9,6 +11,8 @@ export interface Profile {
   gender: string;
   location: string;
   date_of_birth: string;
+  resume_id?: string;
+  parsed_resume?: ParsedResume;
   created_at?: string;
   updated_at?: string;
 }
