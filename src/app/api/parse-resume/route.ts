@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
 
     console.log('Calling Mistral API...');
     const result = await generateObject({
-      model: mistral('mistral-medium-latest'),
+      model: mistral('mistral-large-latest'),
       schema: resumeSchema,
       messages: [
         {

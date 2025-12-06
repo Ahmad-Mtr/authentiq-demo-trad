@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./normalize.css";
 /* 
 --color-shakespeare-50: #f4f7fb;
 --color-shakespeare-100: #e8eff6;
