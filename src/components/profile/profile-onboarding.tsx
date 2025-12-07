@@ -35,6 +35,7 @@ import {
   Plus,
   Trash2,
   ChevronDown,
+  Minus,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { getInitials, cn } from "@/lib/utils";
@@ -1293,7 +1294,8 @@ export default function ProfileOnboarding() {
                 className="h-9 w-9 text-muted-foreground hover:text-destructive"
                 onClick={() => removeSkill(index)}
               >
-                <Trash2 className="h-4 w-4" />
+                {/* <Trash2 className="h-4 w-4" /> */}
+                <Minus className="h-4 w-4" />
               </Button>
             </div>
           ))}
