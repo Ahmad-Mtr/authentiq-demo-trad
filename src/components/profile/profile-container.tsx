@@ -68,7 +68,7 @@ export function ProfileContainer() {
   if (!profile) return <ProfileOnboarding />;
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen items-center justify-center bg-background">
+    <div className="flex font-sans flex-col md:flex-row min-h-screen items-center justify-center bg-background">
       <ProfileSidebar profile={profile} />
       <ProfileTabs profile={profile} />
     </div>
