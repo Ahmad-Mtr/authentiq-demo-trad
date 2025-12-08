@@ -241,7 +241,7 @@
   }
   .txt-idk {
     /* font-family: var(--font-raleway); */
-    @apply max-w-lg scroll-m-20 text-4xl  font-semibold tracking-tight  pb-2 first:mt-0 leading-10 text-foreground text-balance;
+    @apply max-w-lg scroll-m-20 text-4xl  font-semibold tracking-tight  pb-2 first:mt-0 leading-5 text-foreground text-balance;
   }
   .txt-idk-2 {
     /* font-family: var(--font-raleway); */

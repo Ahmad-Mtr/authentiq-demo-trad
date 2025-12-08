@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Profile } from "@/lib/interfaces";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/stores/authStore";
+import ProfileResume from "./profile-resume";
 
 interface ProfileTabsProps {
   profile: Profile;
@@ -35,7 +36,7 @@ export function ProfileTabs({ profile }: ProfileTabsProps) {
             </TabsTrigger>
             <TabsTrigger
               className="text-lg font-semibold py-4 px-5 data-[state=active]:text-foreground text-muted-foreground"
-              value="account"
+              value="resume"
             >
               Resume
             </TabsTrigger>
@@ -45,23 +46,11 @@ export function ProfileTabs({ profile }: ProfileTabsProps) {
         </div>
 
 
-        <TabsContent value="home">See your Posts here.</TabsContent>
-        <TabsContent value="account">
-          <div className="w-full py-32 px-16">
+        <TabsContent value="home" className="w-full py-8 px-16">See your Posts here.</TabsContent>
+        <TabsContent value="resume" className="w-full py-8 px-16">
             <Suspense fallback={<div>Loading profile...</div>}>
-              <div className="txt-title">Resume</div>
-              <Button onClick={handleLogout}>Logout</Button>
-              {profile && (
-                <div>
-                  <h1 className="text-3xl font-bold">{profile.name}</h1>
-                  <p className="text-foreground/75">{profile.role}</p>
-                  <p className="text-muted-foreground text-sm">
-                    {profile.email}
-                  </p>
-                </div>
-              )}
+              <ProfileResume profile={profile}/>
             </Suspense>
-          </div>
         </TabsContent>
       </Tabs>
     </section>
