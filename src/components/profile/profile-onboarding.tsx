@@ -1576,6 +1576,7 @@ export default function ProfileOnboarding() {
 
   return (
     <div className="min-h-screen flex items-center justify-center ">
+      
       <div className="hidden flex-1/3 md:flex flex-col items-center w-fit   p-6 ">
         <div className="">
           <h1 className="text-3xl font-bold  mb-2">
@@ -1586,7 +1587,9 @@ export default function ProfileOnboarding() {
           </p>
         </div>
       </div>
+
       <div className="hidden md:block border border-border min-h-screen"></div>
+      
       <div
         className={cn(
           "md:flex-2/3  w-full md:max-h-screen md:overflow-scroll md:overflow-x-hidden  shadow-lg md:p-6",
