@@ -36,7 +36,7 @@ export const EvervaultCard = ({
             <span className="font-raleway text-white  text-4xl lg:text-6xl font-medium  z-20">
               Join authentiq
             </span>
-            <span className="font-raleway dark:text-white text-white text-lg lg:mt-4 lg:text-xl font-medium z-20">
+            <span className=" dark:text-white text-white text-lg lg:mt-4 lg:text-xl font-medium z-20 ">
               The future of hiring is authentic & decentralized
             </span>
           </div>
