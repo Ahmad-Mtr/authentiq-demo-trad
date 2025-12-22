@@ -38,7 +38,7 @@ export async function POST(req: Request) {
       summary_text: summary,
       embedding: embedding,
       total_yoe: record.total_yoe || 0,
-      skills: record.parsed_resume?.skills?.map((s: Skill) => s.name).filter(Boolean) || [],
+      skill_list: record.parsed_resume?.skills?.map((s: Skill) => s.name).filter(Boolean) || [],
       updated_at: new Date().toISOString(),
     },
     { onConflict: "user_id" }
