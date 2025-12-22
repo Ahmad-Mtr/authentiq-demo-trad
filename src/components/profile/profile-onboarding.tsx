@@ -58,6 +58,7 @@ import {
 import { Badge } from "../ui/badge";
 import { Separator } from "../ui/separator";
 import { useBrowser } from "@/lib/hooks/useBrowser";
+import { totalmem } from "os";
 
 const ONBOARDING_STORAGE_KEY = "authentiq_onboarding_data";
 const TOTAL_STEPS = 4;
@@ -172,6 +173,7 @@ export default function ProfileOnboarding() {
     name: user?.user_metadata?.name || user?.user_metadata?.full_name || "",
     email: user?.email || "",
     role: "",
+    total_yoe: "",
     bio: "",
     location: "",
     date_of_birth: "",
@@ -342,6 +344,7 @@ export default function ProfileOnboarding() {
         !formData.name ||
         !formData.email ||
         !formData.role ||
+        !formData.total_yoe ||
         !formData.location ||
         !formData.date_of_birth ||
         !formData.gender
@@ -687,8 +690,8 @@ export default function ProfileOnboarding() {
                   "w-8 md:w-32 h-0.5 mx-1 md:mx-2",
                   currentStep > step.num
                     ? "bg-primary"
-                    : "bg-muted-foreground/30", 
-                    isDesktop && isFirefox ? "md:w-48":""
+                    : "bg-muted-foreground/30",
+                  isDesktop && isFirefox ? "md:w-48" : ""
                 )}
               />
             )}
@@ -713,7 +716,10 @@ export default function ProfileOnboarding() {
           <div className="flex flex-col items-center gap-4">
             <div className="relative group">
               <Avatar
-                className={cn("size-24  cursor-pointer border-4 border-border hover:border-primary transition-colors", isChromium && isDesktop ? "size-24" : "md:size-32")}
+                className={cn(
+                  "size-24  cursor-pointer border-4 border-border hover:border-primary transition-colors",
+                  isChromium && isDesktop ? "size-24" : "md:size-32"
+                )}
                 onClick={handleAvatarClick}
               >
                 <AvatarImage
@@ -811,6 +817,20 @@ export default function ProfileOnboarding() {
               value={formData.role}
               onChange={handleChange}
               placeholder="e.g. Frontend Developer"
+              required
+            />
+          </Field>
+
+          <Field>
+            <FieldLabel>
+              Years of Experience <span className="text-red-500">*</span>
+            </FieldLabel>
+            <Input
+              type="number"
+              name="total_yoe"
+              value={formData.total_yoe}
+              onChange={handleChange}
+              placeholder="X years"
               required
             />
           </Field>
@@ -936,7 +956,12 @@ export default function ProfileOnboarding() {
           </div>
         ) : (
           <>
-            <FileText className={cn("w-16 h-16 text-muted-foreground", isDesktop && isChromium ?"stroke-[1.7]":"") } />
+            <FileText
+              className={cn(
+                "w-16 h-16 text-muted-foreground",
+                isDesktop && isChromium ? "stroke-[1.7]" : ""
+              )}
+            />
             <div className="text-center">
               <p className="text-lg font-medium mb-1">Upload your resume</p>
               <p className="text-sm text-muted-foreground mb-4">
@@ -978,7 +1003,7 @@ export default function ProfileOnboarding() {
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold mb-2">Experience & Education</h2>
         <p className="text-muted-foreground">
-          Review and edit your professional background 
+          Review and edit your professional background
         </p>
       </div>
 
@@ -1120,8 +1145,6 @@ export default function ProfileOnboarding() {
                             }}
                             placeholder="Led a team of 5 engineers..."
                             className="flex-1 "
-                            
-                            
                           />
                           <Button
                             type="button"
@@ -1553,6 +1576,7 @@ export default function ProfileOnboarding() {
 
   return (
     <div className="min-h-screen flex items-center justify-center ">
+      
       <div className="hidden flex-1/3 md:flex flex-col items-center w-fit   p-6 ">
         <div className="">
           <h1 className="text-3xl font-bold  mb-2">
@@ -1563,13 +1587,18 @@ export default function ProfileOnboarding() {
           </p>
         </div>
       </div>
+
       <div className="hidden md:block border border-border min-h-screen"></div>
-      <div className={cn("md:flex-2/3  w-full md:max-h-screen md:overflow-scroll md:overflow-x-hidden  shadow-lg md:p-6", isChromium && isDesktop ? "md:px-10" : "")}>
+      
+      <div
+        className={cn(
+          "md:flex-2/3  w-full md:max-h-screen md:overflow-scroll md:overflow-x-hidden  shadow-lg md:p-6",
+          isChromium && isDesktop ? "md:px-10" : ""
+        )}
+      >
         <div className=" w-full  rounded-lg shadow-lg p-8">
           <div className="block md:hidden ">
-            <h1 className="text-3xl font-bold mb-2">
-              Welcome to Authentiq 👋
-            </h1>
+            <h1 className="text-3xl font-bold mb-2">Welcome to Authentiq 👋</h1>
             <p className="text-muted-foreground mb-8">
               Let's set up your profile to get started
             </p>
@@ -1608,7 +1637,7 @@ export default function ProfileOnboarding() {
                 <Button
                   type="button"
                   onClick={handleNextStep}
-                  className="flex-1 mt-3 md:text-base md:h-12 w-full md:max-w-[128px] gap-2 md:px-20 rounded-full"
+                  className="flex-1 mt-3 md:text-base md:h-12 w-full md:max-w-[12rem] gap-2 md:px-20 rounded-full"
                   // size={"main"}
                   disabled={
                     isParsingResume || (currentStep === 2 && isUploadingResume)
@@ -1628,7 +1657,7 @@ export default function ProfileOnboarding() {
                   type="button"
                   onClick={handleSubmit}
                   disabled={isSubmitting}
-                  className="flex-1"
+                  className={cn(!isDesktop ? "flex-1": "flex-1 mt-3 md:text-base max-w-[12rem] md:h-12 w-full gap-2 md:px-20 rounded-full")}
                 >
                   {isSubmitting ? (
                     <>

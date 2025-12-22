@@ -7,7 +7,7 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex w-full min-h-svh md:max-h-screen">
+    <div className="flex w-full min-h-svh md:max-h-screen ">
       <div className=" bg-background flex flex-col gap-4 p-6 md:p-8 flex-2/5">
         <div className="flex justify-center gap-2 md:justify-start">
           <a

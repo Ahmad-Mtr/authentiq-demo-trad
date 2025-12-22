@@ -9,6 +9,8 @@ import { ProfileSidebar } from "./profile-sidebar";
 import { ProfileTabs } from "./profile-tabs";
 import ProfileOnboarding from "./profile-onboarding";
 import { useAuthStore } from "@/lib/stores/authStore";
+import { cn } from "@/lib/utils";
+import { useBrowser } from "@/lib/hooks/useBrowser";
 
 export function ProfileContainer() {
   const router = useRouter();
@@ -20,6 +22,7 @@ export function ProfileContainer() {
     setLoading,
     setHasChecked,
   } = useProfileStore();
+  const { isDesktop, isChromium } = useBrowser();
 
   useEffect(() => {
     checkProfileStatus();
@@ -30,8 +33,11 @@ export function ProfileContainer() {
       setLoading(true);
 
       // Get current user from Supabase
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
       if (userError || !user) {
         console.error("Error getting user:", userError);
         router.push("/login");
@@ -68,9 +74,21 @@ export function ProfileContainer() {
   if (!profile) return <ProfileOnboarding />;
 
   return (
-    <div className="flex font-sans flex-col md:flex-row min-h-screen items-center justify-center bg-background">
-      <ProfileSidebar profile={profile} />
-      <ProfileTabs profile={profile} />
+    <div className="min-h-screen flex flex-col  md:flex-row items-center justify-center ">
+      <div className="  flex md:flex-3/10 flex-col items-center h-full w-full   p-6 ">
+        <ProfileSidebar profile={profile} />
+      </div>
+
+      <div className="hidden md:block border border-border min-h-screen"></div>
+
+      <div
+        className={cn(
+          "md:flex-7/10  w-full md:max-h-screen md:overflow-scroll md:overflow-x-hidden  shadow-lg md:p-6",
+          isChromium && isDesktop ? "md:px-10" : ""
+        )}
+      >
+        <ProfileTabs profile={profile} />
+      </div>
     </div>
   );
 }

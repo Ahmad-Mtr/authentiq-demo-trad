@@ -7,6 +7,7 @@ export interface Profile {
   email: string;
   pfp_url?: string;
   role: string;
+  total_yoe: number;
   bio: string;
   gender: string;
   location: string;
