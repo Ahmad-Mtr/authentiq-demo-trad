@@ -266,6 +266,8 @@
   .link {
     @apply underline underline-offset-3 decoration-2  hover:text-accent-foreground transition-colors;
   }
+
+  
 }
 
 /* 

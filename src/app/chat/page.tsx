@@ -51,6 +51,7 @@ import {
 } from "@/components/ai-elements/sources";
 import { RefreshCcwIcon, CopyIcon, GlobeIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import AgentGreeting from "@/components/agent-greeting";
 
 export default function Page() {
   const [input, setInput] = useState("");
@@ -73,8 +74,15 @@ export default function Page() {
 
   return (
     <div className="max-w-4xl mx-auto p-6 relative size-full h-screen ">
-      <div className={cn("flex flex-col h-full", messages.length === 0 && "justify-center")}>
-        <Conversation className={cn(messages.length === 0 ? "hidden" : "h-full")}>
+      <div
+        className={cn(
+          "flex flex-col h-full",
+          messages.length === 0 && "justify-center"
+        )}
+      >
+        <Conversation
+          className={cn(messages.length === 0 ? "hidden" : "h-full")}
+        >
           <ConversationContent>
             {messages.map((message) => (
               <div key={message.id}>
@@ -107,7 +115,7 @@ export default function Page() {
                     case "text":
                       return (
                         <Message key={`${message.id}-${i}`} from={message.role}>
-                          <MessageContent>
+                          <MessageContent className="group-[.is-user]:bg-foreground/7 ">
                             <MessageResponse>{part.text}</MessageResponse>
                           </MessageContent>
                           {message.role === "assistant" &&
@@ -157,11 +165,7 @@ export default function Page() {
           <ConversationScrollButton />
         </Conversation>
 
-
-            <div className="text-center">
-              Hello
-            </div>
-            
+        {messages.length === 0 && <AgentGreeting />}
 
         <PromptInput
           onSubmit={handleSubmit}
@@ -176,6 +180,11 @@ export default function Page() {
           </PromptInputHeader>
           <PromptInputBody>
             <PromptInputTextarea
+              placeholder={
+                messages.length === 0
+                  ? "Paste your job description"
+                  : "Describe the role you're hiring for..."
+              }
               onChange={(e) => setInput(e.target.value)}
               value={input}
             />
