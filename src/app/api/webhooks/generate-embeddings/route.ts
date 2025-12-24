@@ -1,4 +1,3 @@
-// app/api/webhooks/generate-embeddings/route.ts
 import { mistral } from "@ai-sdk/mistral";
 import { embed, generateText } from "ai";
 import { createClient } from "@supabase/supabase-js";
@@ -17,9 +16,9 @@ export async function POST(req: Request) {
     typeof record.parsed_resume === "string"
       ? JSON.parse(record.parsed_resume)
       : record.parsed_resume;
-  console.log("/////////////////New User Name: ", record.name);
-  console.log("Resume Data //////////////////////");
-  console.log(parsedResume?.skills || []);
+  // console.log("/////////////////New User Name: ", record.name);
+  // console.log("Resume Data //////////////////////");
+  // console.log(parsedResume?.skills || []);
 
   const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_ENDPOINT!,
@@ -51,14 +50,14 @@ export async function POST(req: Request) {
   `,
   });
 
-  console.log("@summary: \n", summary);
+  // console.log("@summary: \n", summary);
 
   const { embedding } = await embed({
     model: mistral.textEmbedding("mistral-embed"),
     value: summary,
   });
 
-  console.log("@embedding: \n", embedding);
+  // console.log("@embedding: \n", embedding);
 
   // TODO: Add other metadata fields like location, role, total years of experience, skills, etc.
   const { error } = await supabaseAdmin.from("candidate_search_index").upsert(
