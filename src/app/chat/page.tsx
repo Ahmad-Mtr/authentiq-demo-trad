@@ -49,7 +49,8 @@ import {
   SourcesContent,
   Source,
 } from "@/components/ai-elements/sources";
-import { RefreshCcwIcon, CopyIcon, GlobeIcon } from "lucide-react";
+import { ToolStatus } from "@/components/ai-elements/tool-status";
+import { RefreshCcwIcon, CopyIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import AgentGreeting from "@/components/agent-greeting";
 
@@ -57,6 +58,7 @@ export default function Page() {
   const [input, setInput] = useState("");
 
   const { messages, sendMessage, status, regenerate } = useChat();
+  
   const handleSubmit = (message: PromptInputMessage) => {
     const hasText = Boolean(message.text);
     const hasAttachments = Boolean(message.files?.length);
@@ -155,6 +157,22 @@ export default function Page() {
                         </Reasoning>
                       );
                     default:
+                      if (part.type.startsWith("tool-") && "state" in part) {
+                        const toolName = part.type.replace("tool-", "");
+                        const toolState =
+                          part.state === "output-available"
+                            ? "completed"
+                            : part.state === "input-available"
+                              ? "running"
+                              : "pending";
+                        return (
+                          <ToolStatus
+                            key={`${message.id}-${i}`}
+                            toolName={toolName}
+                            state={toolState}
+                          />
+                        );
+                      }
                       return null;
                   }
                 })}
