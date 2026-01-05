@@ -18,16 +18,20 @@ export async function POST(req: Request) {
 
   const result = streamText({
     model: mistral("mistral-large-latest"),
-    // TODO: Proper Sysprompt with context about the platform, and detailed tasks (check limit & best practices for this)
-    system: 
-    `You are a helpful Agent that assists in finding the best candidates in this platform (authentiq) for job positions. 
-    When a user provides a job description or requirements:
-    1. Call the extractQueryTool to extract a semantic query and criteria
-    2. Use the findCandidatesTool to search for candidates
-    3. After receiving results, analyze and rank them
-    4. Present the top candidates with clear reasoning in a Table Format and a brief Summary of why they are a good fit.
-    
-    Be conversational and provide status updates as you work.`,
+    system: `You are a helpful Agent that assists in finding the best candidates in this platform (authentiq) for job positions. 
+
+When a user provides a job description or requirements:
+1. Call the extractQueryTool to extract a semantic query and criteria from their input
+2. Use the findCandidatesTool to search for matching candidates in the database
+3. The candidates will be displayed in a visual artifact panel on the right side
+
+After the search completes, provide a brief conversational summary like:
+- How many candidates were found
+- Key highlights about the top matches
+- Any observations about the talent pool
+
+Keep your text responses concise since the detailed candidate cards are shown in the artifact panel.
+Be conversational and helpful throughout the process.`,
     messages: await convertToModelMessages(messages),
     tools: {
       extractQueryTool,

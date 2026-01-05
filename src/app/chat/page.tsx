@@ -3,7 +3,7 @@
 import { Input } from "@/components/ui/input";
 import { useChat } from "@ai-sdk/react";
 import { Loader } from "@/components/ai-elements/loader";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Conversation,
   ConversationContent,
@@ -50,14 +50,47 @@ import {
   Source,
 } from "@/components/ai-elements/sources";
 import { ToolStatus } from "@/components/ai-elements/tool-status";
+import {
+  CandidatesArtifact,
+  type Candidate,
+} from "@/components/chat/candidates-artifact";
 import { RefreshCcwIcon, CopyIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import AgentGreeting from "@/components/agent-greeting";
 
 export default function Page() {
   const [input, setInput] = useState("");
+  const [artifactOpen, setArtifactOpen] = useState(false);
 
   const { messages, sendMessage, status, regenerate } = useChat();
+
+  const candidates = useMemo<Candidate[]>(() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const message = messages[i];
+      if (message.role === "assistant") {
+        for (const part of message.parts) {
+          if (
+            part.type === "tool-findCandidatesTool" &&
+            "state" in part &&
+            part.state === "output-available" &&
+            "output" in part &&
+            Array.isArray(part.output)
+          ) {
+            return part.output as Candidate[];
+          }
+        }
+      }
+    }
+    return [];
+  }, [messages]);
+
+  useEffect(() => {
+    if (candidates.length > 0) {
+      setTimeout(() => {
+        setArtifactOpen(true);
+      }, 1000);
+    }
+  }, [candidates]);
   
   const handleSubmit = (message: PromptInputMessage) => {
     const hasText = Boolean(message.text);
@@ -75,13 +108,21 @@ export default function Page() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 relative size-full h-screen ">
+    <div className="flex h-screen w-full">
+      {/* chat area */}
       <div
         className={cn(
-          "flex flex-col h-full",
-          messages.length === 0 && "justify-center"
+          "flex-1 transition-all duration-300",
+          artifactOpen ? "mr-[50%]" : ""
         )}
       >
+        <div className={cn("mx-auto p-6 relative size-full h-screen", artifactOpen ? "max-w-2xl" : "max-w-4xl")}>
+          <div
+            className={cn(
+              "flex flex-col h-full",
+              messages.length === 0 && "justify-center"
+            )}
+          >
         <Conversation
           className={cn(messages.length === 0 ? "hidden" : "h-full")}
         >
@@ -219,7 +260,16 @@ export default function Page() {
             <PromptInputSubmit disabled={!input && !status} status={status} />
           </PromptInputFooter>
         </PromptInput>
+          </div>
+        </div>
       </div>
+
+      {/* THE THING */}
+      <CandidatesArtifact
+        candidates={candidates}
+        isOpen={artifactOpen}
+        onClose={() => setArtifactOpen(false)}
+      />
     </div>
   );
 }
