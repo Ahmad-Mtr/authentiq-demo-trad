@@ -5,10 +5,10 @@ import { Candidate } from "./candidates-artifact";
 import { Badge } from "../ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { getInitials } from "@/lib/utils";
-import { profile } from "console";
 import { Button } from "../ui/button";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import { Streamdown } from "streamdown";
 
 type CandidateCardProps = {
   candidate: Candidate;
@@ -68,10 +68,10 @@ const CandidateCard = ({ candidate, rank }: CandidateCardProps) => {
 
         {candidate.reasoning && (
           <div className="rounded-md bg-muted/50 p-3">
-            <p className="text-sm leading-relaxed text-muted-foreground">
+            <div className="text-sm leading-relaxed text-muted-foreground">
               <span className="font-medium text-foreground">Why: </span>
-              {candidate.reasoning}
-            </p>
+              <Streamdown className="inline">{candidate.reasoning}</Streamdown>
+            </div>
           </div>
         )}
       </CardContent>

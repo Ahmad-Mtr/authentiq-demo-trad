@@ -21,6 +21,21 @@ const findCandidatesSchema = z.object({
     .describe('Preferred location (e.g. "Jordan")'),
 });
 
+const addReasoningSchema = z.object({
+  candidates_with_reasoning: z
+    .array(
+      z.object({
+        user_id: z.string().describe("The candidate's user_id from the search results"),
+        reasoning: z
+          .string()
+          .describe(
+            "One short sentence (max 12 words) answering WHY this candidate fits. Be specific and concise."
+          ),
+      })
+    )
+    .describe("Array of candidates with brief reasoning for each match"),
+});
+
 export const findCandidatesTool = tool({
   description:
     "Search for candidates based on the query you extracted previously via extractQueryTool.",
@@ -76,5 +91,16 @@ export const findCandidatesTool = tool({
         location: profile?.location,
       };
     });
+  },
+});
+
+export const addReasoningTool = tool({
+  description: `After findCandidatesTool returns candidates, call this tool to add reasoning for why each candidate matches the job. 
+Analyze each candidate's profile (name, experience, bio) against the job requirements and provide a brief, specific explanation for each.`,
+  inputSchema: addReasoningSchema,
+
+  execute: async ({ candidates_with_reasoning }) => {
+    console.log("[add_reasoning] Adding reasoning for", candidates_with_reasoning.length, "candidates");
+    return candidates_with_reasoning;
   },
 });

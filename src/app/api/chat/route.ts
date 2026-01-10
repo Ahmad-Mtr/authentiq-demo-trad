@@ -10,7 +10,7 @@ import { mistral } from "@ai-sdk/mistral";
 import z from "zod";
 import { createClient } from "@supabase/supabase-js";
 import supabase from "@/lib/supabase";
-import { findCandidatesTool } from "@/components/tools/find-candidates-tool";
+import { findCandidatesTool, addReasoningTool } from "@/components/tools/find-candidates-tool";
 import { extractQueryTool } from "@/components/tools/extract-query-tool";
 
 export async function POST(req: Request) {
@@ -23,21 +23,18 @@ export async function POST(req: Request) {
 When a user provides a job description or requirements:
 1. Call the extractQueryTool to extract a semantic query and criteria from their input
 2. Use the findCandidatesTool to search for matching candidates in the database
-3. The candidates will be displayed in a visual artifact panel on the right side
+3. IMPORTANT: After findCandidatesTool returns, you MUST call addReasoningTool to provide a brief reasoning for why each candidate (use their user_id) matches the job requirements. Base your reasoning on their experience, skills mentioned in bio, and alignment with the job.
+4. The candidates with reasoning will be displayed in a visual artifact panel
 
-After the search completes, provide a brief conversational summary like:
-- How many candidates were found
-- Key highlights about the top matches
-- Any observations about the talent pool
-
-Keep your text responses concise since the detailed candidate cards are shown in the artifact panel.
-Be conversational and helpful throughout the process.`,
+After all tools complete, provide a brief conversational summary.
+Keep your text responses concise since the detailed candidate cards are shown in the artifact panel.`,
     messages: await convertToModelMessages(messages),
     tools: {
       extractQueryTool,
       findCandidatesTool,
+      addReasoningTool,
     },
-    stopWhen: stepCountIs(5),
+    stopWhen: stepCountIs(6),
   });
 
   return result.toUIMessageStreamResponse();

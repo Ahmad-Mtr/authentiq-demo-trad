@@ -65,8 +65,10 @@ export default function Page() {
   const { messages, sendMessage, status, regenerate } = useChat();
 
   const candidates = useMemo<Candidate[]>(() => {
-    for (let i = messages.length - 1; i >= 0; i--) {
-      const message = messages[i];
+    let foundCandidates: Candidate[] = [];
+    let reasoningMap = new Map<string, string>();
+
+    for (const message of messages) {
       if (message.role === "assistant") {
         for (const part of message.parts) {
           if (
@@ -76,21 +78,42 @@ export default function Page() {
             "output" in part &&
             Array.isArray(part.output)
           ) {
-            return part.output as Candidate[];
+            foundCandidates = part.output as Candidate[];
+          }
+
+          if (
+            part.type === "tool-addReasoningTool" &&
+            "state" in part &&
+            part.state === "output-available" &&
+            "output" in part &&
+            Array.isArray(part.output)
+          ) {
+            const reasoningData = part.output as Array<{ user_id: string; reasoning: string }>;
+            reasoningData.forEach((r) => {
+              reasoningMap.set(r.user_id, r.reasoning);
+            });
           }
         }
       }
     }
-    return [];
+
+    if (foundCandidates.length > 0) {
+      return foundCandidates.map((candidate) => ({
+        ...candidate,
+        reasoning: reasoningMap.get(candidate.user_id) || candidate.reasoning,
+      }));
+    }
+
+    return foundCandidates;
   }, [messages]);
 
   useEffect(() => {
-    if (candidates.length > 0) {
-      setTimeout(() => {
-        setArtifactOpen(true);
-      }, 1000);
+    // open artfiact only when candidates have reasoning
+    const hasReasoning = candidates.some((c) => c.reasoning);
+    if (candidates.length > 0 && hasReasoning && !artifactOpen) {
+      setArtifactOpen(true);
     }
-  }, [candidates]);
+  }, [candidates, artifactOpen]);
   
   const handleSubmit = (message: PromptInputMessage) => {
     const hasText = Boolean(message.text);
