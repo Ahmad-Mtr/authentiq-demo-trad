@@ -50,7 +50,7 @@ const CandidateCard = ({ candidate, rank }: CandidateCardProps) => {
                 {Math.round(candidate.similarity * 100)}% match
               </Badge>
             )}
-            <Link href={`/profile/${candidate.user_id}`}>
+            <Link href={`/profile/${candidate.user_id}`} target="_blank">
               <Button variant={"default"} size={"sm"} className="text-sm!">
                 Profile
                 <ArrowUpRight />

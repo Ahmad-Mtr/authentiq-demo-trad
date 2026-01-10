@@ -7,6 +7,8 @@ import { Profile } from "@/lib/interfaces";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/stores/authStore";
 import ProfileResume from "./profile-resume";
+import Link from "next/link";
+import { AnimatedShinyText } from "../ui/animated-shiny-text";
 
 interface ProfileTabsProps {
   profile: Profile;
@@ -14,7 +16,10 @@ interface ProfileTabsProps {
   isOwnProfile?: boolean;
 }
 
-export function ProfileTabs({ profile, isOwnProfile = true }: ProfileTabsProps) {
+export function ProfileTabs({
+  profile,
+  isOwnProfile = true,
+}: ProfileTabsProps) {
   const router = useRouter();
   const { logOut } = useAuthStore();
 
@@ -26,10 +31,8 @@ export function ProfileTabs({ profile, isOwnProfile = true }: ProfileTabsProps) 
   return (
     <section className="flex md:flex-2 2xl:flex-3 md:h-screen w-full flex-col items-center justify-between sm:items-start ">
       <Tabs defaultValue="home" className="w-full">
-
         {/* Profile Body Tab bar */}
         <div className="flex justify-between font-mono w-full h-auto px-4 border-b-2 border-border ">
-          
           <TabsList className="px-1 md:px-7 space-x-3 py-6  bg-background">
             <TabsTrigger
               className="text-xs md:text-lg font-semibold py-4 px-2 md:px-5 data-[state=active]:text-foreground text-muted-foreground"
@@ -45,17 +48,30 @@ export function ProfileTabs({ profile, isOwnProfile = true }: ProfileTabsProps) 
             </TabsTrigger>
           </TabsList>
 
+          <div className="inline-flex gap-2 md:gap-4 justify-end items-center ">
+            <AnimatedShinyText className="font-medium  bg-linear-to-r from-transparent via-temerald-400 via-50% to-transparent ">
+              <Link href="/chat" className="font-mono">Try /Chat</Link>
+            </AnimatedShinyText>
             {isOwnProfile && (
-              <Button variant="outline" size="lg" className="hidden md:block my-auto" onClick={handleLogout}>Logout</Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="hidden md:block my-auto"
+                onClick={handleLogout}
+              >
+                Logout
+              </Button>
             )}
+          </div>
         </div>
 
-
-        <TabsContent value="home" className="w-full py-8 px-16">See Posts here.</TabsContent>
+        <TabsContent value="home" className="w-full py-8 px-16">
+          See Posts here.
+        </TabsContent>
         <TabsContent value="resume" className="w-full py-8 px-8 md:px-16">
-            <Suspense fallback={<div>Loading profile...</div>}>
-              <ProfileResume profile={profile}/>
-            </Suspense>
+          <Suspense fallback={<div>Loading profile...</div>}>
+            <ProfileResume profile={profile} />
+          </Suspense>
         </TabsContent>
       </Tabs>
     </section>
