@@ -21,14 +21,12 @@ const findCandidatesSchema = z.object({
     .describe('Preferred location (e.g. "Jordan")'),
 });
 
-
 export const findCandidatesTool = tool({
   description:
     "Search for candidates based on the query you extracted previously via extractQueryTool.",
   inputSchema: findCandidatesSchema,
 
   execute: async ({ semantic_query, min_yoe, required_skills }) => {
-    
     console.log("[find_candidates] Semantic Query, ", semantic_query);
 
     const { embedding } = await embed({
@@ -50,7 +48,33 @@ export const findCandidatesTool = tool({
 
     if (error) throw error;
 
-    console.log("[find_candidates] @candidates, ", candidates);
-    return candidates;
+    if (!candidates || candidates.length === 0) {
+      return candidates;
+    }
+
+    // console.log("[find_candidates] @candidates, ", candidates);
+    const userIds = candidates.map((c: any) => c.user_id);
+    console.log("[find_candidates] candidate IDs, ", userIds);
+    
+    const { data: profiles, error: profilesError } = await supabase.rpc(
+      "get_profiles_by_ids_ordered",
+      { user_ids: userIds }
+    );
+
+    if (profilesError) throw profilesError;
+    
+    console.log("[find_candidates] profiles, ", profiles);
+
+    return candidates.map((c: any) => {
+      const profile = profiles?.find((p: any) => p.user_id === c.user_id);
+      return {
+        ...c,
+        name: profile?.name,
+        total_yoe: profile?.total_yoe,
+        pfp_url: profile?.pfp_url,
+        bio: profile?.bio,
+        location: profile?.location,
+      };
+    });
   },
 });
