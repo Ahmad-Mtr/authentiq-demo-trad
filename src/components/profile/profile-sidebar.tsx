@@ -11,9 +11,11 @@ import { useBrowser } from "@/lib/hooks/useBrowser";
 
 interface ProfileSidebarProps {
   profile: Profile;
+  /** Whether the current user is viewing their own profile */
+  isOwnProfile?: boolean;
 }
 
-export function ProfileSidebar({ profile }: ProfileSidebarProps) {
+export function ProfileSidebar({ profile, isOwnProfile = true }: ProfileSidebarProps) {
   const { logOut } = useAuthStore();
   const { isChromium, isDesktop } = useBrowser();
 
@@ -36,14 +38,16 @@ export function ProfileSidebar({ profile }: ProfileSidebarProps) {
             </Avatar>
           </div>
 
-          <Button
-            variant="outline"
-            size="lg"
-            className="md:hidden my-auto"
-            onClick={handleLogout}
-          >
-            Logout
-          </Button>
+          {isOwnProfile && (
+            <Button
+              variant="outline"
+              size="lg"
+              className="md:hidden my-auto"
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          )}
         </div>
 
         {/* Name, Email & Location */}

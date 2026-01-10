@@ -10,9 +10,11 @@ import ProfileResume from "./profile-resume";
 
 interface ProfileTabsProps {
   profile: Profile;
+  /** Whether the current user is viewing their own profile */
+  isOwnProfile?: boolean;
 }
 
-export function ProfileTabs({ profile }: ProfileTabsProps) {
+export function ProfileTabs({ profile, isOwnProfile = true }: ProfileTabsProps) {
   const router = useRouter();
   const { logOut } = useAuthStore();
 
@@ -33,7 +35,7 @@ export function ProfileTabs({ profile }: ProfileTabsProps) {
               className="text-xs md:text-lg font-semibold py-4 px-2 md:px-5 data-[state=active]:text-foreground text-muted-foreground"
               value="home"
             >
-              Home
+              Posts
             </TabsTrigger>
             <TabsTrigger
               className="text-xs md:text-lg font-semibold py-4 px-2 md:px-5 data-[state=active]:text-foreground text-muted-foreground"
@@ -43,11 +45,13 @@ export function ProfileTabs({ profile }: ProfileTabsProps) {
             </TabsTrigger>
           </TabsList>
 
-            <Button variant="outline" size="lg" className="hidden md:block my-auto" onClick={handleLogout}>Logout</Button>
+            {isOwnProfile && (
+              <Button variant="outline" size="lg" className="hidden md:block my-auto" onClick={handleLogout}>Logout</Button>
+            )}
         </div>
 
 
-        <TabsContent value="home" className="w-full py-8 px-16">See your Posts here.</TabsContent>
+        <TabsContent value="home" className="w-full py-8 px-16">See Posts here.</TabsContent>
         <TabsContent value="resume" className="w-full py-8 px-8 md:px-16">
             <Suspense fallback={<div>Loading profile...</div>}>
               <ProfileResume profile={profile}/>
