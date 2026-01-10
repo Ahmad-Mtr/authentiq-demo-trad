@@ -106,6 +106,15 @@
   --color-shakespeare-800: oklch(0.3954 0.0614 243.52);
   --color-shakespeare-900: #253f55;
   --color-shakespeare-950: #182939;
+  --animate-shiny-text: shiny-text 8s infinite;
+  @keyframes shiny-text {
+  0%, 90%, 100% {
+    background-position: calc(-100% - var(--shiny-width)) 0;
+    }
+  30%, 60% {
+    background-position: calc(100% + var(--shiny-width)) 0;
+    }
+  }
 }
 
 :root {
@@ -266,6 +275,7 @@
   .link {
     @apply underline underline-offset-3 decoration-2  hover:text-accent-foreground transition-colors;
   }
+
 }
 
 /* 
@@ -430,3 +440,17 @@
   --shadow-2xl: var(--shadow-2xl);
 }
 */
+
+/* 
+---break---
+
+*/
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

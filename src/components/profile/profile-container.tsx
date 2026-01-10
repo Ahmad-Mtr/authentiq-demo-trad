@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect } from "react";
+import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useProfileStore } from "@/lib/stores/profileStore";
 import { profileAPI } from "@/lib/supabase/profile";
@@ -11,22 +11,65 @@ import ProfileOnboarding from "./profile-onboarding";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { cn } from "@/lib/utils";
 import { useBrowser } from "@/lib/hooks/useBrowser";
+import { Profile } from "@/lib/interfaces";
 
-export function ProfileContainer() {
+interface ProfileContainerProps {
+  userId?: string;
+}
+
+export function ProfileContainer({ userId }: ProfileContainerProps) {
   const router = useRouter();
   const {
-    profile,
-    isLoading,
-    hasChecked,
+    profile: currentUserProfile,
+    isLoading: storeLoading,
+    hasChecked: storeHasChecked,
     setProfile,
     setLoading,
     setHasChecked,
   } = useProfileStore();
   const { isDesktop, isChromium } = useBrowser();
 
+  const [viewedProfile, setViewedProfile] = useState<Profile | null>(null);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+  const [hasCheckedProfile, setHasCheckedProfile] = useState(false);
+  const [isOwnProfile, setIsOwnProfile] = useState(true);
+
   useEffect(() => {
-    checkProfileStatus();
-  }, []);
+    if (userId) {
+      fetchProfileById(userId);
+    } else {
+      checkProfileStatus();
+    }
+  }, [userId]);
+
+  const fetchProfileById = async (targetUserId: string) => {
+    try {
+      setIsLoadingProfile(true);
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      const isOwn = user?.id === targetUserId;
+      setIsOwnProfile(isOwn);
+
+      const targetProfile = await profileAPI.getProfileByUserId(targetUserId);
+
+      if (targetProfile) {
+        setViewedProfile(targetProfile);
+      } else {
+        setViewedProfile(null);
+      }
+
+      setHasCheckedProfile(true);
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      setViewedProfile(null);
+      setHasCheckedProfile(true);
+    } finally {
+      setIsLoadingProfile(false);
+    }
+  };
 
   const checkProfileStatus = async () => {
     try {
@@ -63,6 +106,12 @@ export function ProfileContainer() {
     }
   };
 
+  // Determine which profile and loading state to use
+  const isViewingOther = !!userId;
+  const isLoading = isViewingOther ? isLoadingProfile : storeLoading;
+  const hasChecked = isViewingOther ? hasCheckedProfile : storeHasChecked;
+  const profile = isViewingOther ? viewedProfile : currentUserProfile;
+
   if (isLoading || !hasChecked) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -71,12 +120,24 @@ export function ProfileContainer() {
     );
   }
 
-  if (!profile) return <ProfileOnboarding />;
+  if (!profile) {
+    if (isViewingOther) {
+      return (
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-semibold text-foreground">Profile Not Found</h1>
+            <p className="text-muted-foreground mt-2">This user hasn&apos;t set up their profile yet.</p>
+          </div>
+        </div>
+      );
+    }
+    return <ProfileOnboarding />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col  md:flex-row items-center justify-center ">
       <div className="  flex md:flex-3/10 flex-col items-center h-full w-full   p-6 ">
-        <ProfileSidebar profile={profile} />
+        <ProfileSidebar profile={profile} isOwnProfile={isOwnProfile && !isViewingOther} />
       </div>
 
       <div className="hidden md:block border border-border min-h-screen"></div>
@@ -87,7 +148,7 @@ export function ProfileContainer() {
           isChromium && isDesktop ? "md:px-10" : ""
         )}
       >
-        <ProfileTabs profile={profile} />
+        <ProfileTabs profile={profile} isOwnProfile={isOwnProfile && !isViewingOther} />
       </div>
     </div>
   );
