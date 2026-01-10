@@ -2,7 +2,12 @@
 
 import { cn } from "@/lib/utils";
 import { Shimmer } from "./shimmer";
-import { CheckCircleIcon, SearchIcon, SparklesIcon, LoaderIcon } from "lucide-react";
+import {
+  CheckCircleIcon,
+  SearchIcon,
+  SparklesIcon,
+  LoaderIcon,
+} from "lucide-react";
 import type { ComponentProps } from "react";
 
 export type ToolStatusProps = ComponentProps<"div"> & {
@@ -12,7 +17,12 @@ export type ToolStatusProps = ComponentProps<"div"> & {
 
 const toolConfig: Record<
   string,
-  { label: string; icon: typeof SearchIcon; runningText: string; completedText: string }
+  {
+    label: string;
+    icon: typeof SearchIcon;
+    runningText: string;
+    completedText: string;
+  }
 > = {
   extractQueryTool: {
     label: "Extracting Query",
@@ -25,6 +35,12 @@ const toolConfig: Record<
     icon: SearchIcon,
     runningText: "Searching for matching candidates...",
     completedText: "Search complete",
+  },
+  addReasoningTool: {
+    label: "Reasoning",
+    icon: SearchIcon,
+    runningText: "Adding reasoning...",
+    completedText: "Reasoning added",
   },
   default: {
     label: "Processing",
@@ -48,22 +64,22 @@ export const ToolStatus = ({
   return (
     <div
       className={cn(
-        "flex items-center gap-2 py-2 px-3 rounded-lg my-2",
-        isRunning ? "bg-muted/50" : "bg-muted/30",
+        "flex items-center gap-2 pb-4 px-0  rounded-lg ",
+        // isRunning ? "bg-muted/50" : "bg-muted/30",
         className
       )}
       {...props}
     >
       {isRunning ? (
         <>
-          <Icon className="size-4 text-primary animate-pulse" />
+          {/* <Icon className="size-4 text-primary animate-pulse" /> */}
           <Shimmer className="text-sm font-medium">
             {config.runningText}
           </Shimmer>
         </>
       ) : (
         <>
-          <CheckCircleIcon className="size-4 text-primary" />
+          {/* <CheckCircleIcon className="size-4 text-primary" /> */}
           <span className="text-sm text-muted-foreground">
             {config.completedText}
           </span>
