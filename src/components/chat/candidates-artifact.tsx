@@ -23,6 +23,7 @@ export type Candidate = {
   pfp_url?: string;
   total_yoe?: number;
   skills?: string[];
+  bio?: string;
   similarity?: number;
   reasoning?: string;
 };
@@ -57,14 +58,14 @@ export const CandidatesArtifact = ({
         />
       )}
 
-      <Artifact className="h-full rounded-none border-l shadow-2xl">
-        <ArtifactHeader>
+      <Artifact className="h-full rounded-none border-l  shadow-2xl">
+        <ArtifactHeader className="border-b border-border">
           <div className="flex items-center gap-2">
-            <UsersIcon className="size-5 text-primary" />
-            <ArtifactTitle>Top Candidates</ArtifactTitle>
-            <Badge variant="secondary" className="ml-2">
+            {/* <UsersIcon className="size-5 text-primary" /> */}
+            <ArtifactTitle>Top {candidates.length} Candidates</ArtifactTitle>
+            {/* <Badge variant="secondary" className="ml-2">
               {candidates.length} found
-            </Badge>
+            </Badge> */}
           </div>
           <ArtifactActions>
             {/* <ArtifactAction
@@ -80,9 +81,9 @@ export const CandidatesArtifact = ({
           </ArtifactActions>
         </ArtifactHeader>
 
-        <ArtifactContent className="p-0">
-          <ScrollArea className="h-full">
-            <div className="space-y-3 p-4">
+        <ArtifactContent className="p-0 ">
+          <ScrollArea className="h-full bg-muted/50">
+            <div className="space-y-3 p-4 ">
               {candidates.map((candidate, index) => (
                 <CandidateCard
                   key={candidate.user_id}
