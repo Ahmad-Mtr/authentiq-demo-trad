@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Authentiq
 
-## Getting Started
+An open professional platform Proof-of-Concept with an AI-powered recruiting agent. Think LinkedIn alternative inspired by [atproto](https://atproto.com)/[Bluesky](https://bsky.app), but with smarter talent discovery (This version doesn't implement atproto features).
 
-First, run the development server:
+> > [!NOTE]
+> **Status:** not ready yet, things might break
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## What it does
+
+- **Profiles** — Users create professional profiles and upload resumes
+- **Resume Parsing** — LLM extracts structured data from PDF resumes
+- **Semantic Embeddings** — Profiles are embedded for vector similarity search
+- **AI Recruiting Agent** — Recruiters describe candidates in natural language, agent finds and ranks matches
+
+## Tech Stack
+
+| Layer | Tech |
+|-------|------|
+| Framework | Next.js 16, React 19, TypeScript |
+| Database | Supabase (PostgreSQL + pgvector) |
+| Auth | Supabase Auth |
+| AI | Mistral AI + Vercel AI SDK |
+| UI | Tailwind CSS, Radix UI |
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── (auth)/           # Login, Signup
+│   ├── api/
+│   │   ├── chat/         # AI Agent endpoint
+│   │   └── parse-resume/ # Resume parsing
+│   ├── chat/             # Agent interface
+│   └── profile/          # Profile pages
+├── components/
+│   ├── tools/            # Agent tools (extract, find, reason)
+│   └── chat/             # Candidate cards
+└── lib/
+    ├── interfaces/       # TypeScript types
+    └── supabase/         # DB client
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Agent Flow
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+Recruiter Input → extractQueryTool → findCandidatesTool → addReasoningTool → Candidate Cards
+                  (parse JD)         (semantic search)    (explain matches)
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Setup
 
-## Learn More
+```bash
+# Install deps
+pnpm install
 
-To learn more about Next.js, take a look at the following resources:
+# Set env vars
+cp .env.example .env.local
+# Setup your env vars (for Webhook secret, see /generate-embeddings route)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Run dev server
+pnpm dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## License
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
