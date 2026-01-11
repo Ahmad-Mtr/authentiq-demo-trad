@@ -7,12 +7,12 @@
 - [x] MAKE A Tool to render candidates (so agent doesn't reference someone not knowing he/she wasn't shown bef)
 - [ ] Artifact Trigger
 - [ ] Store Candidates and maybe the JD in Agent's context.3
-- [ ] Get Profile by ID
-- [ ] Show Detailed Profile, in `/profile` view, includes resume
+- [x] Get Profile by ID
+- [x] Show Detailed Profile, in `/profile` view, includes resume
 - [ ] Ranking Algorithm, Design a an algo to weight different things while ranking (needs recruiter input, then add it to sys prompt)
-- [ ] Complete Response View
+- [x] Complete Response View
 - [ ] Support `numOfTalent` (maybe in extract_query with a default)
-- [ ] Do the `.env` thing (the extra sb keys)
+- [x] Do the `.env` thing (the extra sb keys)
 
 ## Imporovements 
 - [ ] Increase Prompt input body size

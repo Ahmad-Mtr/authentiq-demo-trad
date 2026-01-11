@@ -1,8 +1,9 @@
 # Authentiq
 
-An open professional platform with an AI-powered recruiting agent. Think LinkedIn alternative inspired by [atproto](https://atproto.com)/[Bluesky](https://bsky.app), but with smarter talent discovery.
+An open professional platform Proof-of-Concept with an AI-powered recruiting agent. Think LinkedIn alternative inspired by [atproto](https://atproto.com)/[Bluesky](https://bsky.app), but with smarter talent discovery (This version doesn't implement atproto features).
 
-> **Status:** Proof of concept / Demo
+> > [!NOTE]
+> **Status:** not ready yet, things might break
 
 ## What it does
 
@@ -55,7 +56,7 @@ pnpm install
 
 # Set env vars
 cp .env.example .env.local
-# Add: NEXT_PUBLIC_SUPABASE_ENDPOINT, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY, MISTRAL_API_KEY
+# Setup your env vars (for Webhook secret, see /generate-embeddings route)
 
 # Run dev server
 pnpm dev
