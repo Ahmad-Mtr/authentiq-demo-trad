@@ -212,7 +212,9 @@ export default function Page() {
                                 <MessageResponse>{part.text}</MessageResponse>
                               </MessageContent>
                               {message.role === "assistant" &&
-                                i === messages.length - 1 && (
+                                message.id === messages.at(-1)?.id &&
+                                i === message.parts.length - 1 &&
+                                status === "ready" && (
                                   <MessageActions>
                                     <MessageAction
                                       onClick={() => regenerate()}
@@ -317,7 +319,7 @@ export default function Page() {
                   </PromptInputActionMenu>
                 </PromptInputTools>
                 <PromptInputSubmit
-                  disabled={!input && !status}
+                  disabled={!input || status === "streaming" || status === "submitted"}
                   status={status}
                 />
               </PromptInputFooter>
