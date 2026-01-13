@@ -31,9 +31,16 @@ const addReasoningSchema = z.object({
           .describe(
             "One short sentence (max 12 words) answering WHY this candidate fits. Be specific and concise."
           ),
+        match_score: z
+          .number()
+          .min(0)
+          .max(100)
+          .describe(
+            "Final match score (0-100) you calculated using the weighted formula from your instructions. This determines the candidate's rank."
+          ),
       })
     )
-    .describe("Array of candidates with brief reasoning for each match"),
+    .describe("Array of candidates with reasoning and match scores, ordered by match_score descending (best first)"),
 });
 
 export const findCandidatesTool = tool({

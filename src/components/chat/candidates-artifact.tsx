@@ -26,6 +26,7 @@ export type Candidate = {
   bio?: string;
   similarity?: number;
   reasoning?: string;
+  match_score?: number;
 };
 
 export type CandidatesArtifactProps = ComponentProps<"div"> & {

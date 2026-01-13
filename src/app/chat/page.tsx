@@ -66,7 +66,7 @@ export default function Page() {
 
   const candidates = useMemo<Candidate[]>(() => {
     let foundCandidates: Candidate[] = [];
-    let reasoningMap = new Map<string, string>();
+    let reasoningMap = new Map<string, { reasoning: string; match_score?: number }>();
 
     for (const message of messages) {
       if (message.role === "assistant") {
@@ -91,9 +91,10 @@ export default function Page() {
             const reasoningData = part.output as Array<{
               user_id: string;
               reasoning: string;
+              match_score?: number;
             }>;
             reasoningData.forEach((r) => {
-              reasoningMap.set(r.user_id, r.reasoning);
+              reasoningMap.set(r.user_id, { reasoning: r.reasoning, match_score: r.match_score });
             });
           }
         }
@@ -101,10 +102,17 @@ export default function Page() {
     }
 
     if (foundCandidates.length > 0) {
-      return foundCandidates.map((candidate) => ({
-        ...candidate,
-        reasoning: reasoningMap.get(candidate.user_id) || candidate.reasoning,
-      }));
+      const enrichedCandidates = foundCandidates.map((candidate) => {
+        const reasoningInfo = reasoningMap.get(candidate.user_id);
+        return {
+          ...candidate,
+          reasoning: reasoningInfo?.reasoning || candidate.reasoning,
+          match_score: reasoningInfo?.match_score ?? candidate.match_score,
+        };
+      });
+      
+      // Sort by match_score (descending) - agent's calculated ranking takes priority
+      return enrichedCandidates.sort((a, b) => (b.match_score ?? 0) - (a.match_score ?? 0));
     }
 
     return foundCandidates;
