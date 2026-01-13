@@ -3,6 +3,7 @@
 import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useProfileStore } from "@/lib/stores/profileStore";
+import { usePostsStore } from "@/lib/stores/postsStore";
 import { profileAPI } from "@/lib/supabase/profile";
 import supabase from "@/lib/supabase";
 import { ProfileSidebar } from "./profile-sidebar";
@@ -12,6 +13,7 @@ import { useAuthStore } from "@/lib/stores/authStore";
 import { cn } from "@/lib/utils";
 import { useBrowser } from "@/lib/hooks/useBrowser";
 import { Profile } from "@/lib/interfaces";
+import { PostComposer } from "@/components/posts";
 
 interface ProfileContainerProps {
   userId?: string;
@@ -27,12 +29,14 @@ export function ProfileContainer({ userId }: ProfileContainerProps) {
     setLoading,
     setHasChecked,
   } = useProfileStore();
+  const { createPost } = usePostsStore();
   const { isDesktop, isChromium } = useBrowser();
 
   const [viewedProfile, setViewedProfile] = useState<Profile | null>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const [hasCheckedProfile, setHasCheckedProfile] = useState(false);
   const [isOwnProfile, setIsOwnProfile] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (userId) {
@@ -87,6 +91,8 @@ export function ProfileContainer({ userId }: ProfileContainerProps) {
         return;
       }
 
+      setCurrentUserId(user.id);
+
       // Check if profile exists
       const existingProfile = await profileAPI.getProfileByUserId(user.id);
 
@@ -134,6 +140,11 @@ export function ProfileContainer({ userId }: ProfileContainerProps) {
     return <ProfileOnboarding />;
   }
 
+  const handleCreatePost = async (content: string) => {
+    if (!currentUserId || !profile) return;
+    await createPost(currentUserId, content, profile.name, profile.pfp_url || null);
+  };
+
   return (
     <div className="min-h-screen flex flex-col  md:flex-row items-center justify-center ">
       <div className="  flex md:flex-3/10 flex-col items-center h-full w-full   p-6 ">
@@ -150,6 +161,10 @@ export function ProfileContainer({ userId }: ProfileContainerProps) {
       >
         <ProfileTabs profile={profile} isOwnProfile={isOwnProfile && !isViewingOther} />
       </div>
+
+      {isOwnProfile && !isViewingOther && (
+        <PostComposer onSubmit={handleCreatePost} />
+      )}
     </div>
   );
 }

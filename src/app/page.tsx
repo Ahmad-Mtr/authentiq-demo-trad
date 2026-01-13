@@ -1,13 +1,11 @@
-import { ProfileContainer } from "@/components/profile";
+import { FeedContainer } from "@/components/feed";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Profile | Authentiq",
-  description: "View your professional profile",
+  title: "Feed | Authentiq",
+  description: "See what's happening in your feed",
 };
 
 export default function Home() {
-  return (
-      <ProfileContainer />
-  );
+  return <FeedContainer />;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Profile } from "@/lib/interfaces";
@@ -9,6 +9,8 @@ import { useAuthStore } from "@/lib/stores/authStore";
 import ProfileResume from "./profile-resume";
 import Link from "next/link";
 import { AnimatedShinyText } from "../ui/animated-shiny-text";
+import { PostFeed } from "@/components/posts";
+import supabase from "@/lib/supabase";
 
 interface ProfileTabsProps {
   profile: Profile;
@@ -22,6 +24,17 @@ export function ProfileTabs({
 }: ProfileTabsProps) {
   const router = useRouter();
   const { logOut } = useAuthStore();
+  const [currentUserId, setCurrentUserId] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setCurrentUserId(user.id);
+      }
+    };
+    getCurrentUser();
+  }, []);
 
   const handleLogout = async () => {
     await logOut();
@@ -65,8 +78,11 @@ export function ProfileTabs({
           </div>
         </div>
 
-        <TabsContent value="home" className="w-full py-8 px-16">
-          See Posts here.
+        <TabsContent value="home" className="w-full py-4 px-4 md:py-8 md:px-16">
+          <PostFeed 
+            currentUserId={currentUserId} 
+            filterByUserId={profile.user_id} 
+          />
         </TabsContent>
         <TabsContent value="resume" className="w-full py-8 px-8 md:px-16">
           <Suspense fallback={<div>Loading profile...</div>}>
