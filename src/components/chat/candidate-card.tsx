@@ -44,7 +44,7 @@ const CandidateCard = ({ candidate, rank }: CandidateCardProps) => {
               </p>
             </div>
           </div>
-          <div className=" inline-flex gap-1">
+          <div className="flex max-md:flex-col-reverse md:inline-flex gap-1 max-md:items-end">
             {candidate.similarity !== undefined && (
               <Badge variant="outline" className="text-xs!">
                 {Math.round(candidate.similarity * 100)}% <span className="hidden md:block">match</span>

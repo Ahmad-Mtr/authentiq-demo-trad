@@ -15,7 +15,7 @@ const getTimeBasedGreeting = () => {
 const AgentGreeting = () => {
   return (
     <div className="">
-      <div className="flex flex-col items-center justify-center h-full px-4 text-center">
+      <div className="flex flex-col max-md:mt-12 items-center justify-center h-full px-4 text-center">
         {/* <Zap className="size-12 text-muted-foreground mb-4" /> */}
         <h1 className="text-2xl md:text-4xl font-semibold font-raleway mb-2">
           {getTimeBasedGreeting() || "Greetings, "}, Ready to hire?
