@@ -57,11 +57,16 @@ export function PostFeed({ currentUserId, filterByUserId }: PostFeedProps) {
   }
 
   if (displayedPosts.length === 0) {
+    const isOwnProfile = filterByUserId && currentUserId === filterByUserId;
     return (
       <div className="text-center py-12">
         <p className="text-muted-foreground text-lg">No posts yet</p>
         <p className="text-muted-foreground/70 text-sm mt-1">
-          Be the first to share something!
+          {isOwnProfile 
+            ? "Share your first post using the + button!" 
+            : filterByUserId 
+              ? "This user hasn't posted anything yet."
+              : "Be the first to share something!"}
         </p>
       </div>
     );
