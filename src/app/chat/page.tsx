@@ -2,8 +2,10 @@
 
 import { Input } from "@/components/ui/input";
 import { useChat } from "@ai-sdk/react";
+import type { UIMessage } from "ai";
 import { Loader } from "@/components/ai-elements/loader";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { useChatStore, type ChatContext } from "@/lib/stores/chatStore";
 import {
   Conversation,
   ConversationContent,
@@ -54,7 +56,7 @@ import {
   CandidatesArtifact,
   type Candidate,
 } from "@/components/chat/candidates-artifact";
-import { RefreshCcwIcon, CopyIcon } from "lucide-react";
+import { RefreshCcwIcon, CopyIcon, Trash2Icon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import AgentGreeting from "@/components/agent-greeting";
 
@@ -62,7 +64,70 @@ export default function Page() {
   const [input, setInput] = useState("");
   const [artifactOpen, setArtifactOpen] = useState(false);
 
-  const { messages, sendMessage, status, regenerate } = useChat();
+  const {
+    messages: storedMessages,
+    context,
+    setMessages: setStoredMessages,
+    setContext,
+    clearChat,
+    _hasHydrated,
+  } = useChatStore();
+
+  const { messages, setMessages, sendMessage, status, regenerate } = useChat({
+    messages: (_hasHydrated ? storedMessages : []) as UIMessage[],
+  });
+
+  // Sync messages to store when they change
+  useEffect(() => {
+    if (messages.length > 0 && _hasHydrated) {
+      setStoredMessages(messages);
+    }
+  }, [messages, _hasHydrated, setStoredMessages]);
+
+  // Restore messages from store on hydration
+  useEffect(() => {
+    if (_hasHydrated && storedMessages.length > 0 && messages.length === 0) {
+      setMessages(storedMessages);
+    }
+  }, [_hasHydrated, storedMessages, messages.length, setMessages]);
+
+  // Extract and store context from messages
+  useEffect(() => {
+    for (const message of messages) {
+      // Store job description from first user message
+      if (message.role === "user" && !context.jobDescription) {
+        const textPart = message.parts.find((p) => p.type === "text");
+        if (textPart && "text" in textPart) {
+          setContext({ jobDescription: textPart.text });
+        }
+      }
+
+      // Extract query and candidates from tool outputs
+      if (message.role === "assistant") {
+        for (const part of message.parts) {
+          if (
+            part.type === "tool-extractQueryTool" &&
+            "state" in part &&
+            part.state === "output-available" &&
+            "output" in part
+          ) {
+            setContext({ extractedQuery: part.output as ChatContext["extractedQuery"] });
+          }
+
+          if (
+            part.type === "tool-findCandidatesTool" &&
+            "state" in part &&
+            part.state === "output-available" &&
+            "output" in part &&
+            Array.isArray(part.output)
+          ) {
+            const ids = (part.output as { user_id: string }[]).map((c) => c.user_id);
+            setContext({ candidateIds: ids });
+          }
+        }
+      }
+    }
+  }, [messages, context.jobDescription, setContext]);
 
   const candidates = useMemo<Candidate[]>(() => {
     let foundCandidates: Candidate[] = [];
@@ -147,6 +212,12 @@ export default function Page() {
       files: message.files,
     });
     setInput("");
+  };
+
+  const handleClearChat = () => {
+    clearChat();
+    setMessages([]);
+    setArtifactOpen(false);
   };
 
   return (
@@ -317,6 +388,15 @@ export default function Page() {
                       <PromptInputActionAddAttachments />
                     </PromptInputActionMenuContent>
                   </PromptInputActionMenu>
+                  {messages.length > 0 && (
+                    <PromptInputButton
+                      onClick={handleClearChat}
+                      className="text-muted-foreground hover:text-destructive"
+                      title="Clear chat"
+                    >
+                      <Trash2Icon className="size-4" />
+                    </PromptInputButton>
+                  )}
                 </PromptInputTools>
                 <PromptInputSubmit
                   disabled={!input || status === "streaming" || status === "submitted"}
