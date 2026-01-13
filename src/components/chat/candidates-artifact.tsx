@@ -42,23 +42,24 @@ export const CandidatesArtifact = ({
   ...props
 }: CandidatesArtifactProps) => {
   return (
-    <div
-      className={cn(
-        "fixed inset-y-0 right-0 z-50 md:w-1/2 md:min-w-[400px]  transform transition-transform duration-300 ease-in",
-        isOpen ? "translate-x-0" : "translate-x-full",
-        className
-      )}
-      {...props}
-    >
-      {/* Backdrop */}
+    <>
+      {/* Backdrop with no click handler */}
       {isOpen && (
         <div
-          className="fixed inset-0 -z-10 bg-black/20 backdrop-blur-sm"
-          onClick={onClose}
+          className="fixed inset-0 z-40 pointer-events-none"
         />
       )}
 
-      <Artifact className="h-full rounded-none border-l  shadow-2xl">
+      {/* panel */}
+      <div
+        className={cn(
+          "fixed inset-y-0 right-0 z-50 md:w-1/2 md:min-w-[400px] transform transition-transform duration-300 ease-in-out",
+          isOpen ? "translate-x-0" : "translate-x-full",
+          className
+        )}
+        {...props}
+      >
+        <Artifact className="h-full rounded-none border-l shadow-2xl">
         <ArtifactHeader className="border-b border-border">
           <div className="flex items-center gap-2">
             {/* <UsersIcon className="size-5 text-primary" /> */}
@@ -95,7 +96,8 @@ export const CandidatesArtifact = ({
           </ScrollArea>
         </ArtifactContent>
       </Artifact>
-    </div>
+      </div>
+    </>
   );
 };
 

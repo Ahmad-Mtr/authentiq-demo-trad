@@ -111,12 +111,12 @@ export default function Page() {
   }, [messages]);
 
   useEffect(() => {
-    // open artfiact only when candidates have reasoning
     const hasReasoning = candidates.some((c) => c.reasoning);
     if (candidates.length > 0 && hasReasoning && !artifactOpen) {
       setArtifactOpen(true);
     }
-  }, [candidates, artifactOpen]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [candidates]);
 
   const handleSubmit = (message: PromptInputMessage) => {
     const hasText = Boolean(message.text);
