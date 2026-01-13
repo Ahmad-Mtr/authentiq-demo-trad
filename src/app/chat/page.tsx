@@ -139,7 +139,7 @@ export default function Page() {
           artifactOpen ? "mr-[50%]" : ""
         )}
       >
-        <div className={cn("mx-auto p-6 relative size-full h-screen", artifactOpen ? "max-w-2xl" : "max-w-4xl")}>
+        <div className={cn("mx-auto p-2 md:p-6 relative size-full h-screen", artifactOpen ? "max-w-2xl" : "max-w-4xl")}>
           <div
             className={cn(
               "flex flex-col h-full",

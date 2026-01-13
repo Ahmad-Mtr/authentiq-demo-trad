@@ -44,7 +44,7 @@ export const CandidatesArtifact = ({
   return (
     <div
       className={cn(
-        "fixed inset-y-0 right-0 z-50 w-1/2 min-w-[400px]  transform transition-transform duration-300 ease-in",
+        "fixed inset-y-0 right-0 z-50 md:w-1/2 md:min-w-[400px]  transform transition-transform duration-300 ease-in",
         isOpen ? "translate-x-0" : "translate-x-full",
         className
       )}

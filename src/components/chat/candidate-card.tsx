@@ -47,7 +47,7 @@ const CandidateCard = ({ candidate, rank }: CandidateCardProps) => {
           <div className=" inline-flex gap-1">
             {candidate.similarity !== undefined && (
               <Badge variant="outline" className="text-xs!">
-                {Math.round(candidate.similarity * 100)}% match
+                {Math.round(candidate.similarity * 100)}% <span className="hidden md:block">match</span>
               </Badge>
             )}
             <Link href={`/profile/${candidate.user_id}`} target="_blank">
