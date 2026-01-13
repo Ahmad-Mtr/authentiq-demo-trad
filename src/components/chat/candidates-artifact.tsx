@@ -54,7 +54,7 @@ export const CandidatesArtifact = ({
       {/* panel */}
       <div
         className={cn(
-          "fixed inset-y-0 right-0 z-50 md:w-1/2 md:min-w-[400px] transform transition-transform duration-300 ease-in-out",
+          "fixed inset-y-0 right-0 z-50 w-full md:w-1/2 md:min-w-[400px] transform transition-transform duration-300 ease-in-out",
           isOpen ? "translate-x-0" : "translate-x-full",
           className
         )}

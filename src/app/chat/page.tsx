@@ -66,7 +66,10 @@ export default function Page() {
 
   const candidates = useMemo<Candidate[]>(() => {
     let foundCandidates: Candidate[] = [];
-    let reasoningMap = new Map<string, { reasoning: string; match_score?: number }>();
+    let reasoningMap = new Map<
+      string,
+      { reasoning: string; match_score?: number }
+    >();
 
     for (const message of messages) {
       if (message.role === "assistant") {
@@ -94,7 +97,10 @@ export default function Page() {
               match_score?: number;
             }>;
             reasoningData.forEach((r) => {
-              reasoningMap.set(r.user_id, { reasoning: r.reasoning, match_score: r.match_score });
+              reasoningMap.set(r.user_id, {
+                reasoning: r.reasoning,
+                match_score: r.match_score,
+              });
             });
           }
         }
@@ -110,9 +116,11 @@ export default function Page() {
           match_score: reasoningInfo?.match_score ?? candidate.match_score,
         };
       });
-      
+
       // Sort by match_score (descending) - agent's calculated ranking takes priority
-      return enrichedCandidates.sort((a, b) => (b.match_score ?? 0) - (a.match_score ?? 0));
+      return enrichedCandidates.sort(
+        (a, b) => (b.match_score ?? 0) - (a.match_score ?? 0)
+      );
     }
 
     return foundCandidates;
@@ -268,12 +276,17 @@ export default function Page() {
               </ConversationContent>
               <ConversationScrollButton />
             </Conversation>
+            {messages.length === 0 && (
+              <>
+                <div className="flex-1 md:hidden" />
 
-            {messages.length === 0 && <AgentGreeting />}
-
+                <AgentGreeting />
+                <div className="flex-1 md:hidden" />
+              </>
+            )}
             <PromptInput
               onSubmit={handleSubmit}
-              className={cn("mt-4", messages.length === 0 && "mt-auto md:mt-4")}
+              className={cn("mt-4", messages.length === 0 && " md:mt-4")}
               globalDrop
               multiple
             >
@@ -284,6 +297,7 @@ export default function Page() {
               </PromptInputHeader>
               <PromptInputBody>
                 <PromptInputTextarea
+                  className="md:min-h-20"
                   placeholder={
                     messages.length === 0
                       ? "Paste your job description"
