@@ -64,7 +64,7 @@ export const ToolStatus = ({
   return (
     <div
       className={cn(
-        "flex items-center gap-2 pb-4 px-0  rounded-lg ",
+        "flex items-center gap-2 py-2 px-0  rounded-lg ",
         // isRunning ? "bg-muted/50" : "bg-muted/30",
         className
       )}
